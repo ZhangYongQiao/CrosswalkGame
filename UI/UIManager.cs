@@ -38,7 +38,18 @@ public class UIManager
 
     public Dictionary<string, GameObject> panels = new Dictionary<string, GameObject>();        //保存已加载面板数据
 
-    public readonly string _pathCur = System.Environment.CurrentDirectory + @"/data.txt";     //默认数据存储路径
+    public string PathCur
+    {
+        get
+        {
+#if(UNITY_EDITOR || UNITY_STANDALONE)
+            return Path.Combine(Application.dataPath, "data.txt");
+#else
+            return Path.Combine(Application.persistentDataPath, "data.txt");
+#endif
+        }
+    }
+
 
     /// <summary>
     /// 加载面板
@@ -71,7 +82,7 @@ public class UIManager
     /// </summary>
     public void ClickYes()
     {
-        File.Delete(_pathCur);                                       //删除数据
+        File.Delete(PathCur);                                        //删除数据
 
         PlayerData.Instance._vecPos = new Vector3(0,2,0);            //覆盖存档即初始化玩家数据(注：在LoadPanelAndPlayer里面是读取PlayerData数据加载玩家信息的)
         PlayerData.Instance._curScene = "1";

@@ -10,8 +10,8 @@ public class InteractiveManager : MonoBehaviour
     private Transform _cherryGo;                            //获得CherryContianer Transform
     private Transform _gemGO;                               //获得GemContianer Transform
 
-    private string _cherryPrePath = "Prefabs/cherry";       //资源加载路径
-    private string _gemPrePath = "Prefabs/gem";
+    private readonly string _cherryPrePath = "Prefabs/cherry";       //资源加载路径
+    private readonly string _gemPrePath = "Prefabs/gem";
 
     private void Awake()
     {
@@ -45,5 +45,4 @@ public class InteractiveManager : MonoBehaviour
             }
         }
     }
-
 }

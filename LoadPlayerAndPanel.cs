@@ -11,7 +11,7 @@ public class LoadPlayerAndPanel : MonoBehaviour
     //GameObject player;
     GameObject createdPanel;
 
-    private readonly string _path = UIManager.Instance._pathCur;
+    private string _savePath;
 
     private Transform _canvasTrans;
     public Transform CanvasTrans
@@ -47,11 +47,18 @@ public class LoadPlayerAndPanel : MonoBehaviour
     public int _cur_curSceneOriginalScore;
 
 
+
+
     /// <summary>
     /// 加载player 并启动加载面板
     /// </summary>
     void Awake()
-    {   
+    {
+        //获得当前场景
+        _sceneCur = SceneManager.GetActiveScene();
+
+        AudioBGMManager.Instance.PlayBgm(_sceneCur.name);
+        _savePath = UIManager.Instance.PathCur;
         _bloods = new Stack<GameObject>();
         //切换场景后清空字典
         UIManager.Instance.panels.Clear();
@@ -63,13 +70,12 @@ public class LoadPlayerAndPanel : MonoBehaviour
         _orderPanelInGame = CanvasTrans.Find("OrderPanelInGame" + "(Clone)");
         _orderPanelInGame.gameObject.SetActive(false);
         
-        //获得当前场景
-        _sceneCur = SceneManager.GetActiveScene();
+        
         PlayerDataRunTime.Instance._curScene = _sceneCur.name;
         Vector3 loadPosTmp = Vector3.zero;
 
         //如果存在则在PlayerData取值
-        if(File.Exists(_path) && PlayerData.Instance._curScene == _sceneCur.name)
+        if(File.Exists(_savePath) && PlayerData.Instance._curScene == _sceneCur.name)
         {
             PlayerDataRunTime.Instance._curPos = PlayerData.Instance._vecPos;
             PlayerDataRunTime.Instance._curBlood = PlayerData.Instance._blood;
@@ -77,14 +83,14 @@ public class LoadPlayerAndPanel : MonoBehaviour
             loadPosTmp = PlayerDataRunTime.Instance._curPos;
         }
         //当前场景不在1且未保存时，不初始化数据
-        else if(!File.Exists(_path) && _sceneCur.name == "1")
+        else if(!File.Exists(_savePath) && _sceneCur.name == "1")
         {
             PlayerDataRunTime.Instance._curBlood = PlayerDataRunTime.Instance.InitBlood;
             PlayerDataRunTime.Instance._curScore = PlayerDataRunTime.Instance.InitScore;
             PlayerDataRunTime.Instance._curPos = PlayerDataRunTime.Instance.InitPos;
             loadPosTmp = PlayerDataRunTime.Instance._curPos;
         }
-        else if(File.Exists(_path) && PlayerData.Instance._curScene != _sceneCur.name)
+        else if(File.Exists(_savePath) && PlayerData.Instance._curScene != _sceneCur.name)
         {
             PlayerDataRunTime.Instance._curPos = PlayerData.Instance._vecPos;
             PlayerDataRunTime.Instance._curBlood = PlayerData.Instance._blood;

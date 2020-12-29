@@ -8,9 +8,9 @@ using UnityEngine.UI;
 public class UIButton : MonoBehaviour
 {
 
-    private string _pathCur = UIManager.Instance._pathCur;                                      //默认数据存储路径
+    private string _pathCur = "";                                      //默认数据存储路径
 
-    private Transform _canvasTrans;                                                             //提供Canvas组件Transform信息
+    private Transform _canvasTrans;                                    //提供Canvas组件Transform信息
     private Transform CanvasTrans
     {
         get
@@ -26,6 +26,12 @@ public class UIButton : MonoBehaviour
             }
             return _canvasTrans;
         }
+    }
+
+    private void Awake()
+    {
+        _pathCur = UIManager.Instance.PathCur;
+        AudioBGMManager.Instance.PlayBgm();
     }
 
     /// <summary>

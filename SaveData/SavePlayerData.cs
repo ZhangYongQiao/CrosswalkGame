@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public class SavePlayerData : MonoBehaviour
 {
 
-    private readonly string _path = UIManager.Instance._pathCur;             //默认存储数据路径
+    private string _path;                               //默认存储数据路径
 
     private AudioSource _soundEffect;
     public AudioSource SoundEffect
@@ -18,6 +18,11 @@ public class SavePlayerData : MonoBehaviour
                 _soundEffect = GameObject.Find("Audio Source").transform.GetComponent<AudioSource>();
             return _soundEffect;
         }
+    }
+
+    private void Awake()
+    {
+        _path = UIManager.Instance.PathCur;             //初始化
     }
 
     /// <summary>
