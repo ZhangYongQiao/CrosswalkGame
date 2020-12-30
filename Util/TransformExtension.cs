@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public static class TransformExtension
 {
@@ -23,5 +21,26 @@ public static class TransformExtension
             }
         }
         return childs;
+    }
+
+    /// <summary>
+    /// 查找某个物体的子物体的所有子物体并返回（找孙子）
+    /// </summary>
+    /// <param name="trans"></param>
+    /// <param name="index">子物体的下标</param>
+    /// <returns>返回Transform集合</returns>
+    public static List<Transform> FindGrandsons(this Transform trans,int index)
+    {
+        List<Transform> lists = new List<Transform>();
+        Transform sonTransTmp = trans.GetChild(index);
+        if (sonTransTmp)
+        {
+            for (int i = 0; i < sonTransTmp.childCount; i++)
+            {
+                lists.Add(sonTransTmp.GetChild(i));
+            }
+            return lists;
+        }
+        return null;
     }
 }

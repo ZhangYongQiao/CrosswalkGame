@@ -3,26 +3,32 @@ using UnityEngine.SceneManagement;
 using System.IO;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class SavePlayerData : MonoBehaviour
 {
 
-    private string _path;                               //默认存储数据路径
+    private string _playerDataPath;                               //默认存储玩家数据路径
+    private string _interactiveDataPath;                          //默认存储交互物品数据路径
 
-    private AudioSource _soundEffect;
-    public AudioSource SoundEffect
-    {
-        get
-        {
-            if (_soundEffect == null)
-                _soundEffect = GameObject.Find("Audio Source").transform.GetComponent<AudioSource>();
-            return _soundEffect;
-        }
-    }
+    //private AudioSource _soundEffect;
+    //public AudioSource SoundEffect
+    //{
+    //    get
+    //    {
+    //        if (_soundEffect == null)
+    //            _soundEffect = GameObject.Find("Audio Source").transform.GetComponent<AudioSource>();
+    //        return _soundEffect;
+    //    }
+    //}
+
+    private Transform _interactiveManagerGo;
 
     private void Awake()
     {
-        _path = UIManager.Instance.PathCur;             //初始化
+        _playerDataPath = UIManager.Instance.PlayerDataPath;             //初始化
+        _interactiveDataPath = UIManager.Instance.InteractiveDataPath;
+        _interactiveManagerGo = GameObject.Find("InteractiveManager").transform;
     }
 
     /// <summary>
@@ -30,11 +36,42 @@ public class SavePlayerData : MonoBehaviour
     /// </summary>
     public void WriteData()
     {
-        SoundEffectManager.Instance.SoundEffect.Play();
-
-        PlayerData data = new PlayerData();
-        //获取数据
         Scene sceneTmp = SceneManager.GetActiveScene();
+
+        GemCherryInfos infosTmp = new GemCherryInfos();
+        //找出场景当前存在的交互对象
+        List<Transform> gemListTmp = _interactiveManagerGo.FindGrandsons(0);         //Gem
+        List<Transform> cherryListTmp = _interactiveManagerGo.FindGrandsons(1);      //Cherry
+        List<Vector3> gemVecsTmp = new List<Vector3>();
+        List<Vector3> cherryVecsTmp = new List<Vector3>();
+        if (gemListTmp != null)
+        {
+            foreach (var e in gemListTmp)
+            {
+                gemVecsTmp.Add(e.position);
+            }
+        }
+        if (cherryListTmp != null)
+        {
+            foreach (var e in cherryListTmp)
+            {
+                cherryVecsTmp.Add(e.position);
+            }
+        }
+        //合并集合
+        infosTmp._gemCherryVecLists = gemVecsTmp.Concat<Vector3>(cherryVecsTmp).ToList();
+        infosTmp._sceneName = sceneTmp.name;
+        string interavtiveJsonTmp = JsonUtility.ToJson(infosTmp);
+        using (StreamWriter sw = new StreamWriter(_interactiveDataPath))
+        {
+            sw.WriteLine(interavtiveJsonTmp);
+        }
+
+        //播放音效
+        SoundEffectManager.Instance.SoundEffect.Play();
+        
+        //获取数据
+        PlayerData data = new PlayerData();
         PlayerDataRunTime.Instance._curScene = sceneTmp.name;
 
         data._curScene = PlayerDataRunTime.Instance._curScene;
@@ -47,7 +84,7 @@ public class SavePlayerData : MonoBehaviour
             //序列化PlayerData对象 保存至文件
             data._vecPos = player.transform.position;
             string jsonStrTmp = JsonUtility.ToJson(data);
-            using (StreamWriter sw = new StreamWriter(_path))
+            using (StreamWriter sw = new StreamWriter(_playerDataPath))
             {
                 sw.WriteLine(jsonStrTmp);
             }
@@ -65,7 +102,7 @@ public class SavePlayerData : MonoBehaviour
     {
         SoundEffectManager.Instance.SoundEffect.Play();
 
-        File.Delete(_path);
+        File.Delete(_playerDataPath);
         SceneManager.LoadScene("1");
     }
 

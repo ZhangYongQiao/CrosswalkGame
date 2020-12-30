@@ -32,8 +32,8 @@ public class AudioBGMManager
         }
     }
 
-    private Dictionary<string, string> _clipsPath;                      //场景名和路径
-    private Dictionary<string, AudioClip> _clips;                       //场景名和BGM
+    private Dictionary<string, string> _clipsPath;                      //场景名,路径
+    private Dictionary<string, AudioClip> _clips;                       //场景名,音频片段
 
 
     /// <summary>

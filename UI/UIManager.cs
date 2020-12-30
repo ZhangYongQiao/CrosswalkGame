@@ -18,34 +18,28 @@ public class UIManager
         }
     }
 
-    //private Transform _canvasTrans;                                                             //提供Canvas组件Transform信息
-    //private Transform CanvasTrans
-    //{
-    //    get
-    //    {
-    //        if (_canvasTrans == null)
-    //        {
-    //            _canvasTrans = GameObject.Find("Canvas").transform;
-    //            if (_canvasTrans == null) 
-    //            {   
-    //                Debug.LogError("获取Canvas对象失败");
-    //                return null;
-    //            }
-    //        }
-    //        return _canvasTrans;
-    //    }
-    //}
-
     public Dictionary<string, GameObject> panels = new Dictionary<string, GameObject>();        //保存已加载面板数据
 
-    public string PathCur
+    public string PlayerDataPath
     {
         get
         {
 #if(UNITY_EDITOR || UNITY_STANDALONE)
-            return Path.Combine(Application.dataPath, "data.txt");
+            return Path.Combine(Application.dataPath, "PlayerData.txt");
 #else
             return Path.Combine(Application.persistentDataPath, "data.txt");
+#endif
+        }
+    }
+
+    public string InteractiveDataPath
+    {
+        get
+        {
+#if (UNITY_EDITOR || UNITY_STANDALONE)
+            return Path.Combine(Application.dataPath, "InteractiveData.txt");
+#else
+            return Path.Combine(Application.persistentDataPath, "InteractiveData.txt");
 #endif
         }
     }
@@ -82,7 +76,7 @@ public class UIManager
     /// </summary>
     public void ClickYes()
     {
-        File.Delete(PathCur);                                        //删除数据
+        File.Delete(PlayerDataPath);                                        //删除数据
 
         PlayerData.Instance._vecPos = new Vector3(0,2,0);            //覆盖存档即初始化玩家数据(注：在LoadPanelAndPlayer里面是读取PlayerData数据加载玩家信息的)
         PlayerData.Instance._curScene = "1";

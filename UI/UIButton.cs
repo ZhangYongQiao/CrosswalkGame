@@ -8,9 +8,10 @@ using UnityEngine.UI;
 public class UIButton : MonoBehaviour
 {
 
-    private string _pathCur = "";                                      //默认数据存储路径
+    private string _playerDataPath;                                           //默认数据存储路径
+    private string _interactiveDataPath;
 
-    private Transform _canvasTrans;                                    //提供Canvas组件Transform信息
+    private Transform _canvasTrans;                                           //提供Canvas组件Transform信息
     private Transform CanvasTrans
     {
         get
@@ -30,7 +31,8 @@ public class UIButton : MonoBehaviour
 
     private void Awake()
     {
-        _pathCur = UIManager.Instance.PathCur;
+        _playerDataPath = UIManager.Instance.PlayerDataPath;
+        _interactiveDataPath = UIManager.Instance.InteractiveDataPath;
         AudioBGMManager.Instance.PlayBgm();
     }
 
@@ -41,10 +43,8 @@ public class UIButton : MonoBehaviour
     {
         SoundEffectManager.Instance.PlaySoundEffect();
 
-        if (!File.Exists(_pathCur))
+        if (!File.Exists(_playerDataPath))
         {
-            //PlayerDataRunTime.Instance._curBlood = PlayerDataRunTime.Instance.InitBlood;
-            //PlayerDataRunTime.Instance._curScore = PlayerDataRunTime.Instance.InitScore;
             SceneManager.LoadScene("Loading");
         }
         else
@@ -67,22 +67,32 @@ public class UIButton : MonoBehaviour
         SoundEffectManager.Instance.PlaySoundEffect();
 
         //文件存在 则读取信息 并反序列化为对象 并给PlayerData字段赋值
-        if (File.Exists(_pathCur))
+        if (File.Exists(_playerDataPath))
         {
             string jsonStrTmp = null;
-            using (StreamReader sr = new StreamReader(_pathCur))
+            using (StreamReader sr = new StreamReader(_playerDataPath))
             {
                 jsonStrTmp = sr.ReadToEnd();
             }
-
             PlayerData dataTmp = JsonUtility.FromJson<PlayerData>(jsonStrTmp);
-
             if(dataTmp != null)
             {
                 PlayerData.Instance._vecPos = dataTmp._vecPos;
                 PlayerData.Instance._curScene = dataTmp._curScene;
                 PlayerData.Instance._blood = dataTmp._blood;
                 PlayerData.Instance._getScore = dataTmp._getScore;
+            }
+
+            string interactiveJsonStrTmp = null;
+            using (StreamReader sr = new StreamReader(_interactiveDataPath))
+            {
+                interactiveJsonStrTmp = sr.ReadToEnd();
+            }
+            GemCherryInfos infosTmp = JsonUtility.FromJson<GemCherryInfos>(interactiveJsonStrTmp);
+            if (infosTmp != null)
+            {
+                GemCherryInfos.Instance._gemCherryVecLists = infosTmp._gemCherryVecLists;
+                GemCherryInfos.Instance._sceneName = infosTmp._sceneName;
             }
         }
         else
@@ -113,4 +123,5 @@ public class UIButton : MonoBehaviour
         StartCoroutine(ExitDelay());
 #endif
     }
+
 }

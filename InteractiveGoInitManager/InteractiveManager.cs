@@ -2,47 +2,50 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InteractiveManager : MonoBehaviour
-{   
-    public List<BaseInfo> _cherryInfos;                     //设置加载信息
-    public List<BaseInfo> _gemInfos;
-
-    private Transform _cherryGo;                            //获得CherryContianer Transform
-    private Transform _gemGO;                               //获得GemContianer Transform
-
-    private readonly string _cherryPrePath = "Prefabs/cherry";       //资源加载路径
-    private readonly string _gemPrePath = "Prefabs/gem";
-
-    private void Awake()
+public class InteractiveManager
+{
+    private static InteractiveManager _instance;
+    public static InteractiveManager Instance
     {
-        _gemGO = GameObject.Find("GemsContianer").transform;
-        _cherryGo = GameObject.Find("CherrysContianer").transform;
-
-        InitInteractiveGo(_cherryPrePath, _cherryGo, _cherryInfos);
-        InitInteractiveGo(_gemPrePath, _gemGO, _gemInfos);
+        get
+        {
+            if (_instance == null)
+                _instance = new InteractiveManager();
+            return _instance;
+        }
     }
+    #region 待删除
+    //public List<BaseInfo> _cherryInfos;                     //设置加载信息
+    //public List<BaseInfo> _gemInfos;
+
+    //private Transform _cherryGo;                            //获得CherryContianer Transform
+    //private Transform _gemGO;                               //获得GemContianer Transform
+    #endregion
+    public readonly string _cherryPrePath = "Prefabs/cherry";       //资源加载路径
+    public readonly string _gemPrePath = "Prefabs/gem";
+
+    private Dictionary<string, GameObject> _goes;
 
     /// <summary>
     /// 根据给定信息，实例化交互对象
     /// </summary>
     /// <param name="loadPath">加载资源路径</param>
     /// <param name="setParent">父对象</param>
-    /// <param name="goInfo">给定信息</param>
-    private void InitInteractiveGo(string loadPath,Transform setParent,List<BaseInfo> goInfo)
+    /// <param name="goPos">给定位置信息</param>
+    public void InitInteractiveGo(string loadPath, Vector3 goPos, Transform setParent = null)
     {
-        if (!setParent)
-            Debug.LogError("未找到要设置的父对象");
-        GameObject goPreTmp = Resources.Load<GameObject>(loadPath);
-        if (goPreTmp)
+        if (_goes == null)
         {
-            foreach (var info in goInfo)
-            {
-                for (int i = 0; i < info._muchNumPerGroup; i++)
-                {
-                    GameObject cherryTmp = GameObject.Instantiate(goPreTmp, setParent);
-                    cherryTmp.transform.position = new Vector3(info._startPosition.x + info._offset * i, info._startPosition.y, info._startPosition.z);
-                }
-            }
+            _goes = new Dictionary<string, GameObject>();
         }
+        if (_goes.ContainsKey(loadPath))
+        {
+            GameObject.Instantiate<GameObject>(_goes[loadPath], goPos, Quaternion.identity, setParent);
+            return;
+        }
+
+        GameObject go = Resources.Load<GameObject>(loadPath);
+        GameObject.Instantiate<GameObject>(go, goPos, Quaternion.identity, setParent);
+        _goes.Add(loadPath, go);
     }
 }
