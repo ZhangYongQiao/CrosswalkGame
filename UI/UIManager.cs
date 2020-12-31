@@ -76,15 +76,15 @@ public class UIManager
     /// </summary>
     public void ClickYes()
     {
-        File.Delete(PlayerDataPath);                                        //删除数据
+        File.Delete(PlayerDataPath);                                            //删除数据
 
-        PlayerData.Instance._vecPos = new Vector3(0,2,0);            //覆盖存档即初始化玩家数据(注：在LoadPanelAndPlayer里面是读取PlayerData数据加载玩家信息的)
+        PlayerData.Instance._vecPos = new Vector3(0,2,0);                       //覆盖存档即初始化玩家数据(注：在LoadPanelAndPlayer里面是读取PlayerData数据加载玩家信息的)
         PlayerData.Instance._curScene = "1";
         PlayerData.Instance._blood = PlayerDataRunTime.Instance.InitBlood;
         PlayerData.Instance._getScore = PlayerDataRunTime.Instance.InitScore;
         SceneManager.LoadScene(PlayerData.Instance._curScene);
 
-        panels.Clear();                                              //不清空,再次回到主界面会找不到键值对，报错
+        panels.Clear();                                                         //不清空,再次回到主界面会找不到键值对，报错
     }
 
     /// <summary>

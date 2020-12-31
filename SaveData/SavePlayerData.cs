@@ -59,7 +59,8 @@ public class SavePlayerData : MonoBehaviour
             }
         }
         //合并集合
-        infosTmp._gemCherryVecLists = gemVecsTmp.Concat<Vector3>(cherryVecsTmp).ToList();
+        infosTmp._cherryVecLists = cherryVecsTmp;
+        infosTmp._gemVecLists = gemVecsTmp;
         infosTmp._sceneName = sceneTmp.name;
         string interavtiveJsonTmp = JsonUtility.ToJson(infosTmp);
         using (StreamWriter sw = new StreamWriter(_interactiveDataPath))
@@ -103,6 +104,7 @@ public class SavePlayerData : MonoBehaviour
         SoundEffectManager.Instance.SoundEffect.Play();
 
         File.Delete(_playerDataPath);
+        File.Delete(_interactiveDataPath);
         SceneManager.LoadScene("1");
     }
 
@@ -120,6 +122,8 @@ public class SavePlayerData : MonoBehaviour
         PlayerDataRunTime.Instance._curScore = loadPanelTmp._cur_curSceneOriginalScore;
         SceneManager.LoadScene(loadPanelTmp._sceneCur.name);
         PlayerData.Instance._vecPos = new Vector3(0, 2, 0);
+
+        //GemCherryRuntimeInfos.Instance._curGemPos = 
     }
 
 }

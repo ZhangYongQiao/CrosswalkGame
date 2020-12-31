@@ -55,28 +55,11 @@ public class LoadPlayerAndPanel : MonoBehaviour
     /// </summary>
     void Awake()
     {
-        //获得当前场景
-        _sceneCur = SceneManager.GetActiveScene();
+        Init();
 
-        AudioBGMManager.Instance.PlayBgm(_sceneCur.name);
-        _savePath = UIManager.Instance.PlayerDataPath;
-        _bloods = new Stack<GameObject>();
-        //切换场景后清空字典
-        UIManager.Instance.panels.Clear();
-
-        UIManager.Instance.LoadPanel("OrderPanelInGame", CanvasTrans);
-        UIManager.Instance.LoadPanel("PlayerInfoPanelInGame", CanvasTrans);
-
-        _infoTrans = CanvasTrans.Find("PlayerInfoPanelInGame" + "(Clone)");
-        _orderPanelInGame = CanvasTrans.Find("OrderPanelInGame" + "(Clone)");
-        _orderPanelInGame.gameObject.SetActive(false);
-        
-        
-        PlayerDataRunTime.Instance._curScene = _sceneCur.name;
         Vector3 loadPosTmp = Vector3.zero;
-
-        //如果存在则在PlayerData取值
-        if(File.Exists(_savePath) && PlayerData.Instance._curScene == _sceneCur.name)
+        //场景加载时数据的四种情况
+        if (File.Exists(_savePath) && PlayerData.Instance._curScene == _sceneCur.name)
         {
             PlayerDataRunTime.Instance._curPos = PlayerData.Instance._vecPos;
             PlayerDataRunTime.Instance._curBlood = PlayerData.Instance._blood;
@@ -84,11 +67,11 @@ public class LoadPlayerAndPanel : MonoBehaviour
             loadPosTmp = PlayerDataRunTime.Instance._curPos;
 
             GemCherryRuntimeInfos.Instance._curScene = GemCherryInfos.Instance._sceneName;
-            GemCherryRuntimeInfos.Instance._curPos = GemCherryInfos.Instance._gemCherryVecLists;
+            GemCherryRuntimeInfos.Instance._curCherryPos = GemCherryInfos.Instance._cherryVecLists;
+            GemCherryRuntimeInfos.Instance._curGemPos = GemCherryInfos.Instance._gemVecLists;
 
         }
-        //当前场景不在1且未保存时，不初始化数据
-        else if(!File.Exists(_savePath)&& _sceneCur.name =="1")
+        else if (!File.Exists(_savePath) && _sceneCur.name == "1")
         {
             PlayerDataRunTime.Instance._curBlood = PlayerDataRunTime.Instance.InitBlood;
             PlayerDataRunTime.Instance._curScore = PlayerDataRunTime.Instance.InitScore;
@@ -96,9 +79,10 @@ public class LoadPlayerAndPanel : MonoBehaviour
             loadPosTmp = PlayerDataRunTime.Instance._curPos;
 
             GemCherryRuntimeInfos.Instance._curScene = "1";
-            GemCherryRuntimeInfos.Instance._curPos = GemCherryRuntimeInfos.Instance.InitPos;
+            GemCherryRuntimeInfos.Instance._curCherryPos = GemCherryRuntimeInfos.Instance.InitCherryPos;
+            GemCherryRuntimeInfos.Instance._curGemPos = GemCherryRuntimeInfos.Instance.InitGemPos;
         }
-        else if(File.Exists(_savePath) && PlayerData.Instance._curScene != _sceneCur.name)
+        else if (File.Exists(_savePath) && PlayerData.Instance._curScene != _sceneCur.name)
         {
             PlayerDataRunTime.Instance._curPos = PlayerData.Instance._vecPos;
             PlayerDataRunTime.Instance._curBlood = PlayerData.Instance._blood;
@@ -106,56 +90,72 @@ public class LoadPlayerAndPanel : MonoBehaviour
             loadPosTmp = PlayerDataRunTime.Instance.InitPos;
 
             GemCherryRuntimeInfos.Instance._curScene = _sceneCur.name;
-            GemCherryRuntimeInfos.Instance._curPos = GemCherryRuntimeInfos.Instance.InitPos;
+            GemCherryRuntimeInfos.Instance._curCherryPos = GemCherryRuntimeInfos.Instance.InitCherryPos;
+            GemCherryRuntimeInfos.Instance._curGemPos = GemCherryRuntimeInfos.Instance.InitGemPos;
         }
         //与角色信息不同的是，每个场景的交互对象位置都不同，所以必须分出另一种情况讨论
         else if (!File.Exists(_savePath) && _sceneCur.name != "1")
         {
             GemCherryRuntimeInfos.Instance._curScene = _sceneCur.name;
-            GemCherryRuntimeInfos.Instance._curPos = GemCherryRuntimeInfos.Instance.InitPos;
+            GemCherryRuntimeInfos.Instance._curCherryPos = GemCherryRuntimeInfos.Instance.InitCherryPos;
+            GemCherryRuntimeInfos.Instance._curGemPos = GemCherryRuntimeInfos.Instance.InitGemPos;
         }
 
-        //记录第一时间进入当前场景的用户初始信息
+        //记录第一时间进入当前场景的用户初始血量和分数
         _curSceneOriginalBlood = PlayerDataRunTime.Instance._curBlood;
         _cur_curSceneOriginalScore = PlayerDataRunTime.Instance._curScore;
 
-        _childBloodImg = _infoTrans.Find("BloodGroup");
-        _bloodImg = Resources.Load("Prefabs/UIPrefabs/" + "BloodImg") as GameObject;
-        
-
         //信息填充
         {
-            //显示图标
+            //显示血量
             for (int i = 0; i < PlayerDataRunTime.Instance._curBlood; i++)
             {
                 GameObject go = GameObject.Instantiate(_bloodImg, _childBloodImg);
                 _bloods.Push(go);
             }
-
-            //显示分数
+            //显示得分
             _childShowScoreTxt = _infoTrans.Find("ScoreImg").Find("ShowScore").GetComponent<Text>();
             if (_childShowScoreTxt)
                 _childShowScoreTxt.text = PlayerDataRunTime.Instance._curScore.ToString();
 
             //初始化交互对象
-            foreach (var go in GemCherryRuntimeInfos.Instance._curPos)
-            {
-                InteractiveManager.Instance.InitInteractiveGo(InteractiveManager.Instance._cherryPrePath, go, _gemContainer.transform);
-            }
-            //for (int i = 0; i < GemCherryRuntimeInfos.Instance._curPos.Count; i++)
-            //{
-            //    Vector3 vecTmp = GemCherryRuntimeInfos.Instance._curPos.SearchListElemnt<Vector3>(i+1);
-            //    InteractiveManager.Instance.InitInteractiveGo(InteractiveManager.Instance._cherryPrePath, vecTmp, _gemContainer.transform);
-            //}
+            foreach (var go in GemCherryRuntimeInfos.Instance._curCherryPos)
+                InteractiveManager.Instance.InitInteractiveGo(InteractiveManager.Instance._cherryPrePath, go, _cherryContainer.transform);
+            foreach (var go in GemCherryRuntimeInfos.Instance._curGemPos)
+                InteractiveManager.Instance.InitInteractiveGo(InteractiveManager.Instance._gemPrePath, go, _gemContainer.transform);
         }
 
-
-        //加载并实例化
+        //实例化
         GameObject prefabPlayer = Resources.Load<GameObject>("Prefabs\\Player");
         Instantiate<GameObject>(prefabPlayer, loadPosTmp, Quaternion.identity);
 
         //加载面板
         //StartCoroutine(LoadInGamePanel());
+    }
+
+    /// <summary>
+    /// 初始化基本的数据
+    /// </summary>
+    private void Init()
+    {
+        _sceneCur = SceneManager.GetActiveScene();
+
+        AudioBGMManager.Instance.PlayBgm(_sceneCur.name);
+        _savePath = UIManager.Instance.PlayerDataPath;
+        _bloods = new Stack<GameObject>();
+        //切换场景后清空字典
+        UIManager.Instance.panels.Clear();
+        //加载面板
+        UIManager.Instance.LoadPanel("OrderPanelInGame", CanvasTrans);
+        UIManager.Instance.LoadPanel("PlayerInfoPanelInGame", CanvasTrans);
+
+        _infoTrans = CanvasTrans.Find("PlayerInfoPanelInGame" + "(Clone)");
+        _orderPanelInGame = CanvasTrans.Find("OrderPanelInGame" + "(Clone)");
+        _orderPanelInGame.gameObject.SetActive(false);
+        PlayerDataRunTime.Instance._curScene = _sceneCur.name;
+
+        _childBloodImg = _infoTrans.Find("BloodGroup");
+        _bloodImg = Resources.Load("Prefabs/UIPrefabs/" + "BloodImg") as GameObject;
     }
 
     private void Update()

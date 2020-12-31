@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+#region 待删除
 //public class BaseInfo
 //{
 //    [Range(1, 6)]
@@ -13,6 +14,7 @@ using System;
 //    [Range(1.5f, 2f)]
 //    public float _offset;                   //间隔
 //}
+#endregion
 
 [Serializable]
 public class BaseInfo
@@ -20,7 +22,11 @@ public class BaseInfo
     public Vector3 _position;
 }
 
-public class BaseInfos
+public class CherryInfos
 {
-    public List<BaseInfo> _baseInfos;
+    public List<CherryInfo> _cherryInfos;
+}
+public class GemInfos
+{
+    public List<GemInfo> _gemInfos;
 }

@@ -19,5 +19,6 @@ public class GemCherryInfos
 
     public string _sceneName;
 
-    public List<Vector3> _gemCherryVecLists;
+    public List<Vector3> _cherryVecLists;
+    public List<Vector3> _gemVecLists;
 }

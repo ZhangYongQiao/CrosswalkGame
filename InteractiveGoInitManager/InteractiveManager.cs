@@ -14,13 +14,7 @@ public class InteractiveManager
             return _instance;
         }
     }
-    #region 待删除
-    //public List<BaseInfo> _cherryInfos;                     //设置加载信息
-    //public List<BaseInfo> _gemInfos;
 
-    //private Transform _cherryGo;                            //获得CherryContianer Transform
-    //private Transform _gemGO;                               //获得GemContianer Transform
-    #endregion
     public readonly string _cherryPrePath = "Prefabs/cherry";       //资源加载路径
     public readonly string _gemPrePath = "Prefabs/gem";
 

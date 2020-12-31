@@ -91,7 +91,8 @@ public class UIButton : MonoBehaviour
             GemCherryInfos infosTmp = JsonUtility.FromJson<GemCherryInfos>(interactiveJsonStrTmp);
             if (infosTmp != null)
             {
-                GemCherryInfos.Instance._gemCherryVecLists = infosTmp._gemCherryVecLists;
+                GemCherryInfos.Instance._cherryVecLists = infosTmp._cherryVecLists;
+                GemCherryInfos.Instance._gemVecLists = infosTmp._gemVecLists;
                 GemCherryInfos.Instance._sceneName = infosTmp._sceneName;
             }
         }
