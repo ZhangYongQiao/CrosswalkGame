@@ -8,13 +8,13 @@ public static class TransformExtension
     /// </summary>
     /// <param name="trans">父对象Transform</param>
     /// <returns>返回Transform集合</returns>
-    public static List<Transform> GetChildContainComp<T1>(this Transform trans)
+    public static List<Transform> GetChildContainComp<T>(this Transform trans)
     {
         List<Transform> childs = new List<Transform>();
         for (int i = 0; i < trans.childCount; i++)
         {
             Transform childTransTmp =  trans.GetChild(i);
-            T1 tTmp = childTransTmp.GetComponent<T1>();
+            T tTmp = childTransTmp.GetComponent<T>();
             if (tTmp != null)
             {
                 childs.Add(childTransTmp);

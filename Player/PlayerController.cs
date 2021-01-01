@@ -38,6 +38,7 @@ public class PlayerController : MonoBehaviour
 
         _childAnim = trans.Find("playerModule").GetComponent<Animator>();
         _loadPlayerAndPanel = GameObject.Find("Canvas").transform.GetComponent<LoadPlayerAndPanel>();
+
     }
 
     private void Update()
@@ -80,15 +81,17 @@ public class PlayerController : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {   
         //触发界面跳转
-        if (collision.tag == "ToNextScene")
+        if (collision.CompareTag("ToNextScene"))
         {
+            float soundValueTmp = GameObject.Find("Audio Source").GetComponent<AudioSource>().volume;
+            PlayerPrefs.SetFloat("soundValue", soundValueTmp);
             int numTmp = int.Parse(PlayerDataRunTime.Instance._curScene);
             SceneManager.LoadScene((numTmp+1).ToString());
             //TODO
         }
 
         //受伤 触发动画、减血、无敌2s
-        if (collision.tag == "Monster" && _canHurt)
+        if (collision.CompareTag("Monster") && _canHurt)
         {   
             if(_childAnim)
             {
@@ -104,6 +107,8 @@ public class PlayerController : MonoBehaviour
                     {
                         Destroy(go);
                         //TODO
+                        //弹出菜单选项
+                        GameObject.Find("Canvas").transform.Find("DeathLoadPanel(Clone)").gameObject.SetActive(true);
                         Debug.Log("死了");
                         return;
                     }
@@ -114,7 +119,7 @@ public class PlayerController : MonoBehaviour
         }
 
         //吃樱桃
-        if(collision.tag == "IncreaseBlood")
+        if(collision.CompareTag("IncreaseBlood"))
         {   
             Animator animTmp = collision.gameObject.GetComponent<Animator>();
             if(animTmp)
@@ -136,7 +141,7 @@ public class PlayerController : MonoBehaviour
         }
 
         //得宝石
-        if(collision.tag == "Gem")
+        if(collision.CompareTag("Gem"))
         {
             Animator animTmp = collision.gameObject.GetComponent<Animator>();
             if (animTmp)
@@ -149,7 +154,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.tag == "Monster")
+        if (collision.CompareTag("Monster"))
         {
             if (_childAnim)
             {

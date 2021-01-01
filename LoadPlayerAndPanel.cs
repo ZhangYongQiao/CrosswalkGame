@@ -42,13 +42,14 @@ public class LoadPlayerAndPanel : MonoBehaviour
     private bool _isOpen = false;
 
     [HideInInspector]
-    public int _curSceneOriginalBlood;              //进入新场景时玩家信息
+    public int _curSceneOriginalBlood;              //进入新场景时立即记录玩家信息
     [HideInInspector]
     public int _cur_curSceneOriginalScore;
 
-    public GameObject _gemContainer;
+    public GameObject _gemContainer;                
     public GameObject _cherryContainer;
 
+    private GameObject _deathLoadPanel;
 
     /// <summary>
     /// 加载player 并启动加载面板
@@ -151,11 +152,19 @@ public class LoadPlayerAndPanel : MonoBehaviour
 
         _infoTrans = CanvasTrans.Find("PlayerInfoPanelInGame" + "(Clone)");
         _orderPanelInGame = CanvasTrans.Find("OrderPanelInGame" + "(Clone)");
+        _orderPanelInGame.Find("MusicPanel").Find("Slider").GetComponent<Slider>().value = PlayerPrefs.GetFloat("soundValue");
         _orderPanelInGame.gameObject.SetActive(false);
         PlayerDataRunTime.Instance._curScene = _sceneCur.name;
 
         _childBloodImg = _infoTrans.Find("BloodGroup");
         _bloodImg = Resources.Load("Prefabs/UIPrefabs/" + "BloodImg") as GameObject;
+
+        float soundValueTmp = PlayerPrefs.GetFloat("soundValue");
+        GameObject.Find("Audio Source").GetComponent<AudioSource>().volume = soundValueTmp;
+        GameObject.Find("BgmSource").GetComponent<AudioSource>().volume = soundValueTmp;
+
+        _deathLoadPanel = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UIPrefabs/DeathLoadPanel"), GameObject.Find("Canvas").transform);
+        _deathLoadPanel.SetActive(false);
     }
 
     private void Update()

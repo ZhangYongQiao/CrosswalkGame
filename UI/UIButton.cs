@@ -29,11 +29,17 @@ public class UIButton : MonoBehaviour
         }
     }
 
+    private AudioSource _soundEffect;
+
     private void Awake()
     {
         _playerDataPath = UIManager.Instance.PlayerDataPath;
         _interactiveDataPath = UIManager.Instance.InteractiveDataPath;
         AudioBGMManager.Instance.PlayBgm();
+
+        _soundEffect = GameObject.Find("Audio Source").GetComponent<AudioSource>();
+
+        PlayerPrefs.SetFloat("soundValue", _soundEffect.volume);
     }
 
     /// <summary>
@@ -42,6 +48,7 @@ public class UIButton : MonoBehaviour
     public void BeginBtn()
     {
         SoundEffectManager.Instance.PlaySoundEffect();
+        PlayerPrefs.SetFloat("soundValue",_soundEffect.volume);
 
         if (!File.Exists(_playerDataPath))
         {
@@ -102,7 +109,8 @@ public class UIButton : MonoBehaviour
             return;
         }
         //加载存档场景
-        SceneManager.LoadScene(PlayerData.Instance._curScene);
+        PlayerPrefs.SetFloat("soundValue", _soundEffect.volume);
+        SceneManager.LoadSceneAsync(PlayerData.Instance._curScene);
     }
 
     /// <summary>
@@ -111,7 +119,7 @@ public class UIButton : MonoBehaviour
     public void ExitBtn()
     {
         SoundEffectManager.Instance.PlaySoundEffect();
-
+        PlayerPrefs.SetFloat("soundValue", _soundEffect.volume);
         StartCoroutine(ExitDelay());
     }
 

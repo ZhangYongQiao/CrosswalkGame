@@ -83,6 +83,7 @@ public class UIManager
         PlayerData.Instance._blood = PlayerDataRunTime.Instance.InitBlood;
         PlayerData.Instance._getScore = PlayerDataRunTime.Instance.InitScore;
         SceneManager.LoadScene(PlayerData.Instance._curScene);
+        PlayerPrefs.SetFloat("soundValue", GameObject.Find("Audio Source").GetComponent<AudioSource>().volume);
 
         panels.Clear();                                                         //不清空,再次回到主界面会找不到键值对，报错
     }

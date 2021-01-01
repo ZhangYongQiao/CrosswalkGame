@@ -11,24 +11,17 @@ public class SavePlayerData : MonoBehaviour
     private string _playerDataPath;                               //默认存储玩家数据路径
     private string _interactiveDataPath;                          //默认存储交互物品数据路径
 
-    //private AudioSource _soundEffect;
-    //public AudioSource SoundEffect
-    //{
-    //    get
-    //    {
-    //        if (_soundEffect == null)
-    //            _soundEffect = GameObject.Find("Audio Source").transform.GetComponent<AudioSource>();
-    //        return _soundEffect;
-    //    }
-    //}
-
     private Transform _interactiveManagerGo;
+
+    private AudioSource _soundEffect;
 
     private void Awake()
     {
         _playerDataPath = UIManager.Instance.PlayerDataPath;             //初始化
         _interactiveDataPath = UIManager.Instance.InteractiveDataPath;
         _interactiveManagerGo = GameObject.Find("InteractiveManager").transform;
+
+        _soundEffect = GameObject.Find("Audio Source").GetComponent<AudioSource>();
     }
 
     /// <summary>
@@ -37,6 +30,7 @@ public class SavePlayerData : MonoBehaviour
     public void WriteData()
     {
         Scene sceneTmp = SceneManager.GetActiveScene();
+        PlayerPrefs.SetFloat("soundValue", _soundEffect.volume);
 
         GemCherryInfos infosTmp = new GemCherryInfos();
         //找出场景当前存在的交互对象
@@ -102,6 +96,7 @@ public class SavePlayerData : MonoBehaviour
     public void NewGameStart()
     {
         SoundEffectManager.Instance.SoundEffect.Play();
+        PlayerPrefs.SetFloat("soundValue", _soundEffect.volume);
 
         File.Delete(_playerDataPath);
         File.Delete(_interactiveDataPath);
@@ -114,6 +109,7 @@ public class SavePlayerData : MonoBehaviour
     public void ReStart()
     {
         SoundEffectManager.Instance.SoundEffect.Play();
+        PlayerPrefs.SetFloat("soundValue", _soundEffect.volume);
 
         Transform canvasTransTmp = GameObject.Find("Canvas").transform;
         LoadPlayerAndPanel loadPanelTmp = canvasTransTmp.GetComponent<LoadPlayerAndPanel>();
@@ -123,7 +119,6 @@ public class SavePlayerData : MonoBehaviour
         SceneManager.LoadScene(loadPanelTmp._sceneCur.name);
         PlayerData.Instance._vecPos = new Vector3(0, 2, 0);
 
-        //GemCherryRuntimeInfos.Instance._curGemPos = 
     }
 
 }
