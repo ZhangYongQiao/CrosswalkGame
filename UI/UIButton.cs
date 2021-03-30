@@ -52,7 +52,7 @@ public class UIButton : MonoBehaviour
 
         if (!File.Exists(_playerDataPath))
         {
-            SceneManager.LoadScene("Loading");
+            SceneManager.LoadScene("1");
         }
         else
         {

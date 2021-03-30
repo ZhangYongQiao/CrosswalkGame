@@ -30,16 +30,22 @@ public class PlayerController : MonoBehaviour
 
     private LoadPlayerAndPanel _loadPlayerAndPanel;     //获取LoadPlayerAndPanel脚本中的成员
 
+    public AnimationClip _clip;                 //受伤动画片段
+    private float _clipLenght;                  
+
     private void Awake()
     {
+        _clipLenght = _clip.length;             //获得受伤动画时长
+
         rigid = GetComponent<Rigidbody2D>();
         trans = GetComponent<Transform>();
         coll  = GetComponent<Collider2D>();
 
         _childAnim = trans.Find("playerModule").GetComponent<Animator>();
         _loadPlayerAndPanel = GameObject.Find("Canvas").transform.GetComponent<LoadPlayerAndPanel>();
-
     }
+
+   
 
     private void Update()
     {
@@ -71,10 +77,23 @@ public class PlayerController : MonoBehaviour
         //受伤后进入2s无敌时间
         if (!_canHurt && _invincibleTime > 0)
             _invincibleTime -= Time.deltaTime;
+
         if (_invincibleTime <= 0)
         {
             _invincibleTime = _setInvincibleTime;
             _canHurt = !_canHurt;
+        }
+
+        //防止如果角色和怪物一直接触出现一直播放动画的状态
+        if(_childAnim.GetBool("Hurt"))
+        {   
+            if(_clipLenght<0)
+            {
+                _childAnim.SetBool("Hurt", false);
+                _clipLenght = _clip.length;
+            }
+            else
+                _clipLenght -= Time.deltaTime;
         }
     }
 
@@ -85,9 +104,10 @@ public class PlayerController : MonoBehaviour
         {
             float soundValueTmp = GameObject.Find("Audio Source").GetComponent<AudioSource>().volume;
             PlayerPrefs.SetFloat("soundValue", soundValueTmp);
+
             int numTmp = int.Parse(PlayerDataRunTime.Instance._curScene);
-            SceneManager.LoadScene((numTmp+1).ToString());
-            //TODO
+            MessageData data = new MessageData(numTmp+1);
+            MessageCenter.Instance.Send(MessageName.SCENE_JUMP, data);
         }
 
         //受伤 触发动画、减血、无敌2s
@@ -109,6 +129,9 @@ public class PlayerController : MonoBehaviour
                         //TODO
                         //弹出菜单选项
                         GameObject.Find("Canvas").transform.Find("DeathLoadPanel(Clone)").gameObject.SetActive(true);
+
+                        Time.timeScale = 0;
+
                         Debug.Log("死了");
                         return;
                     }
@@ -129,14 +152,17 @@ public class PlayerController : MonoBehaviour
 
             //满血加分、缺血加血
             if (PlayerDataRunTime.Instance._curBlood == 5)
-            {
-                PlayerDataRunTime.Instance._curScore += 2;
+            {   
+                //发送消息
+                PlayerDataRunTime.Instance._curScore +=2;
+                MessageData data = new MessageData(PlayerDataRunTime.Instance._curScore);
+                MessageCenter.Instance.Send(MessageName.SCORE_CHANGE, data);
             }
             else
             {
                 PlayerDataRunTime.Instance._curBlood += 1;
-                GameObject go = GameObject.Instantiate(_loadPlayerAndPanel._bloodImg,_loadPlayerAndPanel._childBloodImg);
-                _loadPlayerAndPanel._bloods.Push(go);
+                MessageData data = new MessageData(PlayerDataRunTime.Instance._curBlood);
+                MessageCenter.Instance.Send(MessageName.ADD_BLOOD, data);
             }
         }
 
@@ -148,18 +174,32 @@ public class PlayerController : MonoBehaviour
                 animTmp.SetTrigger("Get");
             animTmp.transform.GetComponent<BoxCollider2D>().enabled = false;                        //防止多次接触
             Destroy(collision.gameObject, 0.3f);
+
+            //发送消息
             PlayerDataRunTime.Instance._curScore += 1;
+            MessageData data = new MessageData(PlayerDataRunTime.Instance._curScore);
+            MessageCenter.Instance.Send(MessageName.SCORE_CHANGE, data);
+        }
+
+        //掉落至下界 直接死亡
+        if (collision.CompareTag("LowerBound"))
+        {
+            GameObject.Find("Canvas").transform.Find("DeathLoadPanel(Clone)").gameObject.SetActive(true);
+
+            Time.timeScale = 0;
+
+            Debug.Log("死了");
         }
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Monster"))
-        {
-            if (_childAnim)
-            {
-                _childAnim.SetBool("Hurt", false);
-            }
-        }
-    }
+    //private void OnTriggerExit2D(Collider2D collision)
+    //{
+    //    if (collision.CompareTag("Monster"))
+    //    {
+    //        if (_childAnim)
+    //        {
+    //            _childAnim.SetBool("Hurt", false);
+    //        }
+    //    }
+    //}
 }
