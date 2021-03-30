@@ -8,10 +8,24 @@ using UnityEngine.SceneManagement;
 
 public class CurPlayer
 {
-    public static Vector3 Pos;
-    public static byte Blood;
-    public static ushort Score;
-    public static string Scene;
+    private static CurPlayer _instance;
+    public static CurPlayer Instance
+    {
+        get
+        {
+            if (_instance == null) 
+                _instance = new CurPlayer();
+            return _instance;
+        }
+        private set { }
+    }
+
+    private CurPlayer() { }
+
+    public Vector3 Pos;
+    public byte Blood;
+    public ushort Score;
+    public string Scene;
 }
 
 [Serializable]
@@ -21,12 +35,4 @@ public class Player
     public byte Blood;
     public ushort Score;
     public string Scene;
-
-    public Player(Vector3 pos,byte blood,ushort score,string scene)
-    {
-        Pos = pos;
-        Blood = blood;
-        Score = score;
-        Scene = scene;
-    }
 }

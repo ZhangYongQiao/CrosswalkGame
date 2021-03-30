@@ -6,12 +6,26 @@ using System;
 
 public class CurMonster
 {
-    public static Vector3 Pos;
+    private static CurMonster _instance;
+    public static CurMonster Instance
+    {
+        get
+        {
+            if (_instance == null)
+                _instance = new CurMonster();
+            return _instance;
+        }
+        private set { }
+    }
+
+    private CurMonster() { }
+
+    public List<Transform> PosList;
 }
 
 [Serializable]
 public class Monster
 {
-    public Vector3 Pos;
+    public List<Transform> PosList;
 }
 

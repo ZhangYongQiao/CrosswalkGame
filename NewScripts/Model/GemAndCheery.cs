@@ -6,11 +6,25 @@ using System;
 
 public class CurGemAndCheery
 {
-    public static Vector3 Pos;
+    private static CurGemAndCheery _instance;
+    public static CurGemAndCheery Instance
+    {
+        get
+        {
+            if (_instance == null)
+                _instance = new CurGemAndCheery();
+            return _instance;
+        }
+        private set { }
+    }
+
+    private CurGemAndCheery() { }
+
+    public List<Transform> PosList;
 }
 
 [Serializable]
 public class GemAndCheery
 {
-    public Vector3 Pos;
+    public List<Transform> PosList;
 }
