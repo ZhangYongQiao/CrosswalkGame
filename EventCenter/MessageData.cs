@@ -5,21 +5,24 @@ using System;
 
 public class MessageData
 {
-    public int valueInt;
-    public bool valueBool;
-    public float valueFloat;
+    public object data;
 
-    public MessageData(int value)
+    public object param;
+
+    /// <summary>
+    /// 数据传输
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="info"></param>
+    public MessageData(object value,object info)
     {
-        valueInt = value;
+        data = value;
+        param = info;
     }
-    public MessageData(float value)
+
+    public MessageData(object info)
     {
-        valueFloat = value;
-    }
-    public MessageData(bool value)
-    {
-        valueBool = value;
+        param = info;
     }
 
 }

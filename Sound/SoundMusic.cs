@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class CherryInfo : BaseInfo
-{   
+public class SoundMusic : MonoBehaviour
+{
+    public AudioSource AudioSource;
+
 }

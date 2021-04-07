@@ -91,12 +91,12 @@ public class GetCompUtility
     /// <typeparam name="T">链表内置类型</typeparam>
     /// <param name="list1">1</param>
     /// <param name="list2">2</param>
-    /// <param name="isRepead">链表元素是否重复</param>
+    /// <param name="isRepeated">链表元素是否重复</param>
     /// <returns>合并后的链表</returns>
-    public static List<T> ConcatList<T>(List<T> list1,List<T> list2,bool isRepead)
+    public static List<T> ConcatList<T>(List<T> list1,List<T> list2,bool isRepeated)
     {
         List<T> newList;
-        if (!isRepead)
+        if (!isRepeated)
             newList = list1.Union(list2).ToList<T>();
         else
             newList = list1.Concat(list2).ToList<T>();

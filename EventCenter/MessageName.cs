@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class MessageName
+public static class MessageName
 {
-    public const string SCENE_JUMP = "scene_jump";
-
-    public const string SCORE_CHANGE = "score_change";
-
-    public const string ADD_BLOOD = "add_blood";
+    //自动隐藏UI
+    public const string OnAutoHide = "OnAutoHide";
+    //播放音效
+    public const string OnPlaySoundEffect = "OnPlaySoundEffect";
+    //自动保存声音大小值
+    public const string OnAutoSaveSoundEffectValue = "OnAutoSaveSoundValue";
+    //发送跳转场景时间
+    public const string OnToloadScene = "OnToLoadScene";
 }
