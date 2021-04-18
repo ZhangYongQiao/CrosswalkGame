@@ -10,13 +10,12 @@ public class MainPanel : BaseUI
     public CustomButton BeginButton;
     public CustomButton ResumeButton;
     public CustomButton ExitButton;
-    public CustomButton SettingButton;
+    public RotateButton SettingButton;
 
 
     protected override void Awake()
     {
         base.Awake();
-
         BeginButton.onClick.AddListener(OnBeginBtn);
         ResumeButton.onClick.AddListener(OnResumeBtn);
         ExitButton.onClick.AddListener(OnExitBtn);
@@ -30,26 +29,33 @@ public class MainPanel : BaseUI
 
     private void OnExitBtn()
     {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     private void OnResumeBtn()
     {
+        bool isExist = DataUtility.ReadJsonToData();
+
+        if (isExist)
+        {
+            string resumeScene = CurPlayer.Instance.Scene;
+            DataUtility.SceneName = resumeScene;
+            SceneManager.LoadScene(LoadUtility.LoadingScene);
+        }
+        else
+        {
+            return;
+        }
     }
 
     private void OnBeginBtn()
     {
-        string name = "1";
-        MessageData data = new MessageData(name);
-        MessageCenter.Instance.Send(MessageName.OnToloadScene, data);
-        SceneManager.LoadScene("Loading");
+        string name = LoadUtility.FirstScene;
+        DataUtility.SceneName = name;
+        SceneManager.LoadScene(LoadUtility.LoadingScene);
     }
-
-    private void LoadNextScene()
-    {
-
-    }
-
-
-
-
 }

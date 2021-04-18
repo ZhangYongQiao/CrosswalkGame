@@ -10,8 +10,8 @@ public class SettingPanel : BaseUI
     public Slider MusicSlider;
     public CustomButton ExitBtn;
 
-    public AudioSource Effect;
-    public AudioSource Music;
+    private AudioSource Effect;
+    private AudioSource Music;
 
     protected override void Awake()
     {
@@ -45,7 +45,7 @@ public class SettingPanel : BaseUI
     private void SetVolume(float value, AudioSource audio) { audio.volume = value / 100; }
 
     /// <summary>
-    /// 每次打开面板自动设置数据
+    /// 打开面板加载数据
     /// </summary>
     private void OnEnable()
     { 

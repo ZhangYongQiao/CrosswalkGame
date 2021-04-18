@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class UIManager
 {
@@ -44,16 +45,24 @@ public class UIManager
 
     public void Init()
     {
+        LoadUICanvas();
         ShowUI(PrefabConst.MainPanel);
-        LoadUtility.InstantiateOtherPrefabs(PrefabConst.SoundEffects, LoadUtility.SoundPath,null);
-        LoadUtility.InstantiateOtherPrefabs(PrefabConst.SoundMusic, LoadUtility.SoundPath,null);
+        CreateAudioListener();
+        CreateEventSystem();
+
+        #region 实例化音源
+        GameObject soundEffect = LoadUtility.InstantiateOtherPrefabs(PrefabConst.SoundEffects, LoadUtility.SoundPath,null);
+        GameObject soundMusic = LoadUtility.InstantiateOtherPrefabs(PrefabConst.SoundMusic, LoadUtility.SoundPath,null);
+        GameObject.DontDestroyOnLoad(soundEffect);
+        GameObject.DontDestroyOnLoad(soundMusic);
+        #endregion
     }
 
     /// <summary>
     /// 显示UI
     /// </summary>
     /// <param name="name">UI名称</param>
-    public void ShowUI(string name)
+    public T ShowUI<T>(string name)
     {   
         if(_hideUIDic != null && _hideUIDic.ContainsKey(name))
         {
@@ -68,6 +77,7 @@ public class UIManager
         go = LoadUtility.InstantiateUIPrefabs(name,ShowCanvasGo.transform,false);
         _instantiatedDic.Add(name, go);
         PushUI(go);
+        return go.GetComponent<T>();
     }
 
     /// <summary>
@@ -83,7 +93,7 @@ public class UIManager
         }
         else
         {
-            Debug.LogError("未实例化该物体");
+            Log.Error("未实例化该物体");
             return;
         }
     }
@@ -104,10 +114,11 @@ public class UIManager
     /// 显示窗口时，将其移动至ShowCanvas下
     /// </summary>
     /// <param name="name">UI名称</param>
-    private void MoveToShow(string name)
+    private void MoveToShow<T>(string name,ref T comp)
     {
         _hideUIDic[name].transform.SetParent(ShowCanvasGo.transform);
         _hideUIDic[name].SetActive(true);
+        comp = _hideUIDic[name].GetComponent<T>();
         PushUI(_hideUIDic[name]);
         _hideUIDic.Remove(name);
     }
@@ -142,6 +153,27 @@ public class UIManager
         else if (_popUI.Count == 1)
             _popUI.Pop();
         else
-            Debug.LogError("栈为空");
+            Log.Error("栈为空");
     }
+
+    #region 创建基本组件
+    private void LoadUICanvas()
+    {
+        GameObject canvas = Resources.Load<GameObject>("Prefabs/UIPrefabs/UICanvas");
+        GameObject.Instantiate<GameObject>(canvas);
+    }
+
+    private void CreateAudioListener()
+    {
+        GameObject gameObject = new GameObject("AudioListener");
+        gameObject.AddComponent<AudioListener>();
+    }
+    private void CreateEventSystem()
+    {
+        GameObject gameObject = new GameObject("EventSystem");
+        gameObject.AddComponent<EventSystem>();
+        gameObject.AddComponent<StandaloneInputModule>();
+    }
+    #endregion
+
 }

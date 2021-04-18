@@ -32,6 +32,27 @@ public class FileOperation
         }
     }
 
+    public static void WriteFileNow(string path, string txt, bool isAppend)
+    {
+        if (File.Exists(path))
+        {
+            using (StreamWriter sw = new StreamWriter(path, isAppend, Encoding.UTF8))
+            {
+                sw.WriteLine(txt);
+            }
+        }
+        else
+        {
+            using (FileStream fs = new FileStream(path, FileMode.Create))
+            {
+                using (StreamWriter sw = new StreamWriter(fs, Encoding.UTF8))
+                {
+                    sw.WriteLine(txt);
+                }
+            }
+        }
+    }
+
     /// <summary>
     /// 向文件读数据
     /// </summary>
@@ -53,7 +74,7 @@ public class FileOperation
         }
         else
         {
-            Debug.LogError("不存在该路径文件");
+            Log.Error("不存在该路径文件");
             return null;
         }
     }

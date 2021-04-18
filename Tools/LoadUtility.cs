@@ -7,8 +7,14 @@ using System.IO;
 public class LoadUtility
 {
     public const string UIPath = "Prefabs/UIPrefabs";
-    public const string MonstersPath = "Prefabs/Monsters";
+    public const string MonstersPath = "Prefabs/Monster";
     public const string SoundPath = "Prefabs/SoundPrefabs";
+    public const string GemPath = "Prefabs";
+    public const string CherryPath = "Prefabs";
+    public const string OtherPath = "Prefabs";
+    public const string LoadingScene = "Loading";
+    public const string FirstScene = "1";
+
 
     public static Dictionary<string,GameObject> m_ObjectPrefabsDic;
 
@@ -17,7 +23,7 @@ public class LoadUtility
     {
         GameObject go = Resources.Load<GameObject>(Path.Combine(path, name));
         if (go == null)
-            Debug.LogError(string.Format("加载预制体{0}失败。", name));
+            Log.Error(string.Format("加载预制体{0}失败。", name));
         else
             AddDic(name, go);
     }
@@ -31,7 +37,7 @@ public class LoadUtility
     {
          GameObject go = Resources.Load<GameObject>(Path.Combine(path, name));
         if (go == null)
-            Debug.LogError(string.Format("加载预制体{0}失败。", name));
+            Log.Error(string.Format("加载预制体{0}失败。", name));
         else
             AddDic(name, go);
     }
@@ -45,7 +51,7 @@ public class LoadUtility
     {
         GameObject go = Resources.Load<GameObject>(Path.Combine(path, name));
         if (go == null)
-            Debug.LogError(string.Format("加载预制体{0}失败。", name));
+            Log.Error(string.Format("加载预制体{0}失败。", name));
         else
             AddDic(name, go);
     }
@@ -87,7 +93,7 @@ public class LoadUtility
 
         if (!m_ObjectPrefabsDic.ContainsKey(name))
         {
-            Debug.LogError("实例化失败，字典中不存在此预制体");
+            Log.Error("实例化失败，字典中不存在此预制体");
             return null;
         }
         GameObject go = GameObject.Instantiate(m_ObjectPrefabsDic[name], parent, worldPosStay);
@@ -109,7 +115,7 @@ public class LoadUtility
 
         if (!m_ObjectPrefabsDic.ContainsKey(name))
         {
-            Debug.LogError("实例化失败，字典中不存在此预制体");
+            Log.Error("实例化失败，字典中不存在此预制体");
             return null;
         }
         return GameObject.Instantiate(m_ObjectPrefabsDic[name], parent, worldPosStay);
@@ -128,6 +134,5 @@ public class LoadUtility
         LoadPrefabs(name, path);
         return GameObject.Instantiate(m_ObjectPrefabsDic[name], parent, false);
     }
-
     #endregion
 }

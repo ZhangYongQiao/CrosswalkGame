@@ -5,24 +5,24 @@ using System;
 
 public class MessageData
 {
-    public object data;
+    public object _type;
 
-    public object param;
+    public object _data;
 
     /// <summary>
     /// 数据传输
     /// </summary>
     /// <param name="value"></param>
-    /// <param name="info"></param>
-    public MessageData(object value,object info)
+    /// <param name="data"></param>
+    public MessageData(object type,object data)
     {
-        data = value;
-        param = info;
+        _type = type;
+        _data = data;
     }
 
     public MessageData(object info)
     {
-        param = info;
+        _data = info;
     }
 
 }

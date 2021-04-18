@@ -20,7 +20,7 @@ public class CurGem
 
     private CurGem() { }
 
-    public List<Transform> PosList;
+    public List<Vector3> PosList;
 }
 
 public class CurCherry
@@ -39,17 +39,17 @@ public class CurCherry
 
     private CurCherry() { }
 
-    public List<Transform> PosList;
+    public List<Vector3> PosList;
 }
 
 [Serializable]
 public class Gem
 {
-    public List<Transform> PosList;
+    public List<Vector3> PosList;
 }
 
 [Serializable]
 public class Cherry
 {
-    public List<Transform> PosList;
+    public List<Vector3> PosList;
 }

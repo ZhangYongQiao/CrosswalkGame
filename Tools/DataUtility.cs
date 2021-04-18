@@ -18,9 +18,14 @@ public class DataUtility
 
     public const string GemTag = "Gem";
     public const string CherryTag = "Cherry";
+    public const string MonsterTag = "Monster";
 
     public const string SoundMusicKey = "SoundMusic";
     public const string SoundEffectKey = "SoundEffect";
+
+    public const string InitPath = "InitDataFolder";
+
+    public static string SceneName = null;
 
     #region PlayerPrefs
 
@@ -51,31 +56,115 @@ public class DataUtility
             Scene = CurPlayer.Instance.Scene
         };
 
-        List<Transform> monsterPosList = GetCompUtility.GetAllSameCompGo<MonsterMove>();
-        List<Transform> gemPosList = GetCompUtility.FindAllTag(GemTag);
-        List<Transform> cherryPosList = GetCompUtility.FindAllTag(CherryTag);
+        List<Monster> monsterList = GetMonsterList();
+        List<Vector3> gemPosList = GetCompUtility.FindAllTag(GemTag);
+        List<Vector3> cherryPosList = GetCompUtility.FindAllTag(CherryTag);
 
         JsonToWrite<Player>(player,RolePath);
-        JsonToWrite<List<Transform>>(monsterPosList, MonsterPath);
-        JsonToWrite<List<Transform>>(gemPosList, GemPath);
-        JsonToWrite<List<Transform>>(cherryPosList, CherryPath);
+        JsonToWrite<List<Monster>>(monsterList, MonsterPath);
+        JsonToWrite<List<Vector3>>(gemPosList, GemPath);
+        JsonToWrite<List<Vector3>>(cherryPosList, CherryPath);
+    }
+
+    private static List<Monster> GetMonsterList()
+    {
+        List<Monster> monsterList = new List<Monster>();
+        GameObject box = GameObject.Find("MonsterBox(Clone)");
+        if (box)
+        {
+            for (int i = 0; i < box.transform.childCount; i++)
+            {
+                Transform trans = box.transform.GetChild(i);
+                Monster monster = new Monster();
+                if (trans.name.Remove(trans.name.Length - 7, 7) == "Eagle")
+                {
+                    monster.monsterType = MonsterType.Eagle;
+                    monster.Pos = trans.position;
+                    monsterList.Add(monster);
+                }
+                else if (trans.name.Remove(trans.name.Length - 7, 7) == "Opossum")
+                {
+                    monster.monsterType = MonsterType.Frog;
+                    monster.Pos = trans.position;
+                    monsterList.Add(monster);
+                }
+                else
+                {
+                    monster.monsterType = MonsterType.Opossum;
+                    monster.Pos = trans.position;
+                    monsterList.Add(monster);
+                }
+            }
+        }
+        else
+        {
+            Log.Error("DataUtility-GetMonsterList:获取怪物信息失败");
+            return null;
+        }
+        return monsterList;
     }
 
 #endregion
 
     #region 读取数据
 
-    public static void ReadJsonToData()
+    public static List<Vector3> ReadInitGemData(string level)
     {
-        Player player = ReadToData<Player>(RolePath);
-        List<Transform> monsterPosList = ReadToData<List<Transform>>(MonsterPath);
-        List<Transform> gemListPos = ReadToData<List<Transform>>(GemPath);
-        List<Transform> cherryListPos = ReadToData<List<Transform>>(CherryPath);
+        string newStr = string.Format("Level_{0}_Gem.json", level);
+        TextAsset initData = Resources.Load<TextAsset>(Path.Combine(InitPath, newStr));
+        List<Vector3> postion = JsonConvert.DeserializeObject<List<Vector3>>(initData.text) as List<Vector3>;
+        return postion;
+    }
 
-        if(player == null || monsterPosList == null || monsterPosList.Count == 0 || gemListPos == null || gemListPos.Count ==0
-            || cherryListPos == null || cherryListPos.Count == 0)
+    public static List<Vector3> ReadInitCherryData(string level)
+    {
+        string newStr = string.Format("Level_{0}_Cherry.json", level);
+        TextAsset initData = Resources.Load<TextAsset>(Path.Combine(InitPath, newStr));
+        List<Vector3> postion = JsonConvert.DeserializeObject<List<Vector3>>(initData.text) as List<Vector3>;
+        return postion;
+    }
+
+    public static List<Monster> ReadInitMonsterData(string level)
+    {
+        string newStr = string.Format("Level_{0}_Monster.json", level);
+        TextAsset initData = Resources.Load<TextAsset>(Path.Combine(InitPath, newStr));
+        List<Monster> monsters = JsonConvert.DeserializeObject<List<Monster>>(initData.text) as List<Monster>;
+        return monsters;
+    }
+
+    public static Player ReadInitPlayerData(string level)
+    {
+        string newStr = string.Format("Level_{0}_Player.json", level);
+        TextAsset initData = Resources.Load<TextAsset>(Path.Combine(InitPath, newStr));
+        Player player = JsonConvert.DeserializeObject<Player>(initData.name) as Player;
+        return player;
+    }
+
+    public static bool ReadJsonToData()
+    {
+#if UNITY_EDITOR
+        if(!File.Exists(Path.Combine(EditorSavePath,RolePath)))
         {
-            Debug.LogError("数据加载出错");
+            UIManager.Instance.ShowUI(PrefabConst.DataNotExistPanel);
+            Log.Error("读取文件出错");
+            return false;
+        }
+#else
+        if(!File.Exists(Path.Combine(StandardAloneSavePath,RolePath)))
+        {
+            UIManager.Instance.ShowUI(PrefabConst.DataNotExistPanel);
+            return false;
+        }
+#endif
+        Player player = ReadToData<Player>(RolePath);
+        List<Monster> monsterList = ReadToData<List<Monster>>(MonsterPath);
+        List<Vector3> gemListPos = ReadToData<List<Vector3>>(GemPath);
+        List<Vector3> cherryListPos = ReadToData<List<Vector3>>(CherryPath);
+
+        if(player == null || monsterList == null || monsterList.Count == 0 || gemListPos == null 
+            || gemListPos.Count ==0 || cherryListPos == null || cherryListPos.Count == 0)
+        {
+            Log.Error("数据加载出错");
         }
 
         CurPlayer.Instance.Pos = player.Pos;
@@ -83,12 +172,15 @@ public class DataUtility
         CurPlayer.Instance.Scene = player.Scene;
         CurPlayer.Instance.Score = player.Score;
 
-        CurMonster.Instance.PosList = monsterPosList;
+        CurMonster.Instance.MonsterList = monsterList; 
+
         CurGem.Instance.PosList = gemListPos;
         CurCherry.Instance.PosList = cherryListPos;
+
+        return true;
     }
 
-    #endregion
+#endregion
 
     /// <summary>
     /// 序列化，写入文件
@@ -108,7 +200,7 @@ public class DataUtility
 #endif
         }
         else
-            Debug.LogError("传入数据为空");
+            Log.Error("传入数据为空");
     }
 
     /// <summary>
@@ -131,8 +223,7 @@ public class DataUtility
             return data;
         }
         else
-            Debug.LogError("文件中可能不存在数据");
+            Log.Error("文件中可能不存在数据");
         return default;
     }
-
 }

@@ -56,7 +56,7 @@ public class GetCompUtility
     {
         if (parent == null) 
         {
-            Debug.LogError("此时父物体不能为空");
+            Log.Error("此时父物体不能为空");
             return null;
         }
         List<Transform> list = new List<Transform>();
@@ -74,13 +74,24 @@ public class GetCompUtility
     /// </summary>
     /// <param name="tag">标签</param>
     /// <returns>返回集合</returns>
-    public static List<Transform> FindAllTag(string tag)
+    public static List<Vector3> FindAllTag(string tag)
     {
-        List<Transform> list = new List<Transform>();
+        List<Vector3> list = new List<Vector3>();
         GameObject[] arr = GameObject.FindGameObjectsWithTag(tag);
         for (int i = 0; i < arr.Length; i++)
         {
-            list.Add(arr[i].transform);
+            list.Add(arr[i].transform.position);
+        }
+        return list;
+    }
+
+    public static List<GameObject> FindAllGoOfTag(string tag)
+    {
+        List<GameObject> list = new List<GameObject>();
+        GameObject[] arr = GameObject.FindGameObjectsWithTag(tag);
+        for (int i = 0; i < arr.Length; i++)
+        {
+            list.Add(arr[i]);
         }
         return list;
     }
