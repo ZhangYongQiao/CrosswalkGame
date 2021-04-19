@@ -114,4 +114,11 @@ public class GetCompUtility
 
         return newList;
     }
+
+
+    public static string SubClone(string name)
+    {
+        return name.Remove(name.Length - 7, 7);
+    }
+
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -46,16 +47,21 @@ public class MainPanel : BaseUI
             DataUtility.SceneName = resumeScene;
             SceneManager.LoadScene(LoadUtility.LoadingScene);
         }
-        else
-        {
-            return;
-        }
     }
 
     private void OnBeginBtn()
-    {
+    {   
+        UIManager.Instance.MoveAllChildToHide(UIManager.Instance.ShowCanvasGo.transform);
         string name = LoadUtility.FirstScene;
         DataUtility.SceneName = name;
         SceneManager.LoadScene(LoadUtility.LoadingScene);
+    }
+
+    private void OnDestroy()
+    {
+        BeginButton.onClick.RemoveListener(OnBeginBtn);
+        ResumeButton.onClick.RemoveListener(OnResumeBtn);
+        ExitButton.onClick.RemoveListener(OnExitBtn);
+        SettingButton.onClick.RemoveListener(OnSettingBtn);
     }
 }

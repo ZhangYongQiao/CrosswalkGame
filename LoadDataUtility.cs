@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
+using DG.Tweening;
+using System;
 
 public class LoadDataUtility : MonoBehaviour
 {
@@ -11,8 +13,44 @@ public class LoadDataUtility : MonoBehaviour
         LoadAll();
     }
 
+    bool isOut = false;
+    InGameOrderPanel info = null;
+    public void PopInGameOrder()
+    {
+        if ((Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1)) && !isOut)
+        {
+            info = UIManager.Instance.ShowUI<InGameOrderPanel>(PrefabConst.InGameOrderPanel);
+            Vector3 vec = info.transform.position;
+            info.transform.DOMove(vec + new Vector3(-420, 0, 0), 0.5f);
+            isOut = true;
+            MessageData data = new MessageData(EffectType.Pop);
+            MessageCenter.Instance.Send(MessageName.OnPlaySoundEffect, data);
+        }
+        else if ((Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1)) && isOut)
+        {
+            Vector3 vec = info.transform.position;
+            info.transform.DOMove(vec + new Vector3(420, 0, 0), 0.5f);
+            isOut = false;
+            StartCoroutine(CallBackHide());
+            MessageData data = new MessageData(EffectType.Pop);
+            MessageCenter.Instance.Send(MessageName.OnPlaySoundEffect, data);
+        }
+    }
+
+    private void Update()
+    {
+        PopInGameOrder();
+    }
+
+    IEnumerator CallBackHide()
+    {
+        yield return new WaitForSeconds(0.5f);
+        UIManager.Instance.HideUI(PrefabConst.InGameOrderPanel);
+    }
+
     private void LoadAll()
     {
+        InitUI();
         InitPlayer();
         InitCamera();
         InitMonster();
@@ -20,13 +58,14 @@ public class LoadDataUtility : MonoBehaviour
         InitGem();
     }
 
-    private void Update()
+    GameObject show;
+    GameObject hide;
+    private void InitUI()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            GameObject go = UIManager.Instance.ShowUI(PrefabConst.InGameOrder);
-            transform.DOMoveX(-420, 0.5f);
-        }
+        //show = GameObject.FindGameObjectWithTag("ShowCanvas");
+        //hide= GameObject.FindGameObjectWithTag("HideCanvas");
+
+        UIManager.Instance.ShowUI(PrefabConst.ShowInfoPanel);
     }
 
     private void InitGem()
@@ -81,7 +120,6 @@ public class LoadDataUtility : MonoBehaviour
             }
         }
     }
-
 
     private void InitCamera()
     {

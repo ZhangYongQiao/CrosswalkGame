@@ -5,8 +5,10 @@ using UnityEngine;
 
 public class SoundEffect : MonoBehaviour
 {
-    public AudioClip one;
-    public AudioClip two;
+    public AudioClip BtnClickEff;
+    public AudioClip EnterPointerEff;
+    public AudioClip PopWindowEff;
+    public AudioClip RewardEff;
 
     public AudioSource AudioSource;
 
@@ -14,7 +16,6 @@ public class SoundEffect : MonoBehaviour
     {
         MessageCenter.Instance.Register(MessageName.OnPlaySoundEffect, PlaySoundEffectHandler);
         MessageCenter.Instance.Register(MessageName.OnAutoSaveSoundEffectValue, SaveSoundEffectValueHandler);
-        MessageCenter.Instance.Register(MessageName.OnPlayPointerEnterEffect, PlayPointerEnterSoundEffectHandler);
     }
 
     private void SaveSoundEffectValueHandler(MessageData obj)
@@ -27,22 +28,43 @@ public class SoundEffect : MonoBehaviour
 
     public void PlaySoundEffectHandler(MessageData data)
     {
-        AudioSource.clip = one;
+        EffectType type = (EffectType)data._data;
+        switch (type)
+        {
+            case EffectType.Pop:
+                AudioSource.clip = PopWindowEff;
+                break;
+            case EffectType.Button:
+                AudioSource.clip = BtnClickEff;
+                break;
+            case EffectType.ButtonEnter:
+                AudioSource.clip = EnterPointerEff;
+                break;
+            case EffectType.GetReward:
+                AudioSource.clip = RewardEff;
+                break;
+            case EffectType.Win:
+                break;
+            default:
+                Log.Error("音效消息出错");
+                break;
+        }
         AudioSource.Play();
-    }
 
-    public void PlayPointerEnterSoundEffectHandler(MessageData data)
-    {
-        AudioSource.clip = two;
-        if(!AudioSource.isPlaying)
-            AudioSource.Play();
     }
 
     private void OnDestroy()
     {
         MessageCenter.Instance.Remove(MessageName.OnPlaySoundEffect, PlaySoundEffectHandler);
         MessageCenter.Instance.Remove(MessageName.OnAutoSaveSoundEffectValue, SaveSoundEffectValueHandler);
-        MessageCenter.Instance.Remove(MessageName.OnPlayPointerEnterEffect, PlayPointerEnterSoundEffectHandler);
-
     }
+}
+
+enum EffectType
+{
+    Pop = 1,
+    Button = 2,
+    ButtonEnter = 4,
+    GetReward = 8,
+    Win = 16
 }

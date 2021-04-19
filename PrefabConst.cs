@@ -9,8 +9,9 @@ public class PrefabConst
     public const string MainPanel = "MainPanel";
     public const string SettingPanel = "SettingPanel";
     public const string UICanvas = "UICanvas";
-    public const string InGameOrder = "InGameOrderPanel";
+    public const string InGameOrderPanel = "InGameOrderPanel";
     public const string DataNotExistPanel = "DataNotExistPanel";
+    public const string ShowInfoPanel = "ShowInfoPanel";
     #endregion
 
     #region

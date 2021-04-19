@@ -45,29 +45,41 @@ public class UIManager
 
     public void Init()
     {
-        LoadUICanvas();
+        GameObject go = LoadUICanvas();
+        GameObject.DontDestroyOnLoad(go);
         ShowUI(PrefabConst.MainPanel);
         CreateAudioListener();
         CreateEventSystem();
 
-        #region 实例化音源
+        //ShowUI(PrefabConst.InGameOrderPanel);
+
+        //实例化音源
         GameObject soundEffect = LoadUtility.InstantiateOtherPrefabs(PrefabConst.SoundEffects, LoadUtility.SoundPath,null);
         GameObject soundMusic = LoadUtility.InstantiateOtherPrefabs(PrefabConst.SoundMusic, LoadUtility.SoundPath,null);
         GameObject.DontDestroyOnLoad(soundEffect);
         GameObject.DontDestroyOnLoad(soundMusic);
-        #endregion
+    }
+
+    public void MoveAllChildToHide(Transform parent)
+    {
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            Transform trans = parent.GetChild(i);
+            HideUI(GetCompUtility.SubClone(trans.name));
+        }
     }
 
     /// <summary>
     /// 显示UI
     /// </summary>
     /// <param name="name">UI名称</param>
-    public T ShowUI<T>(string name)
-    {   
+    public T ShowUI<T>(string name) where T : UnityEngine.Component
+    {
+        T comp;
         if(_hideUIDic != null && _hideUIDic.ContainsKey(name))
         {
-            MoveToShow(name);
-            return;
+            MoveToShow<T>(name,out comp);
+            return comp;
         }
 
         if (_instantiatedDic == null) _instantiatedDic = new Dictionary<string, GameObject>();
@@ -75,9 +87,27 @@ public class UIManager
 
         GameObject go;
         go = LoadUtility.InstantiateUIPrefabs(name,ShowCanvasGo.transform,false);
+        comp = go.GetComponent<T>();
         _instantiatedDic.Add(name, go);
         PushUI(go);
-        return go.GetComponent<T>();
+        return comp;
+    }
+
+    public void ShowUI(string name)
+    {
+        if (_hideUIDic != null && _hideUIDic.ContainsKey(name))
+        {
+            MoveToShow(name);
+            return ;
+        }
+
+        if (_instantiatedDic == null) _instantiatedDic = new Dictionary<string, GameObject>();
+        if (_popUI == null) _popUI = new Stack<GameObject>();
+
+        GameObject go;
+        go = LoadUtility.InstantiateUIPrefabs(name, ShowCanvasGo.transform, false);
+        _instantiatedDic.Add(name, go);
+        PushUI(go);
     }
 
     /// <summary>
@@ -114,11 +144,19 @@ public class UIManager
     /// 显示窗口时，将其移动至ShowCanvas下
     /// </summary>
     /// <param name="name">UI名称</param>
-    private void MoveToShow<T>(string name,ref T comp)
+    private void MoveToShow<T>(string name,out T comp)
     {
         _hideUIDic[name].transform.SetParent(ShowCanvasGo.transform);
         _hideUIDic[name].SetActive(true);
         comp = _hideUIDic[name].GetComponent<T>();
+        PushUI(_hideUIDic[name]);
+        _hideUIDic.Remove(name);
+    }
+
+    private void MoveToShow(string name)
+    {
+        _hideUIDic[name].transform.SetParent(ShowCanvasGo.transform);
+        _hideUIDic[name].SetActive(true);
         PushUI(_hideUIDic[name]);
         _hideUIDic.Remove(name);
     }
@@ -157,10 +195,11 @@ public class UIManager
     }
 
     #region 创建基本组件
-    private void LoadUICanvas()
+    private GameObject LoadUICanvas()
     {
         GameObject canvas = Resources.Load<GameObject>("Prefabs/UIPrefabs/UICanvas");
-        GameObject.Instantiate<GameObject>(canvas);
+        GameObject go = GameObject.Instantiate<GameObject>(canvas);
+        return go;
     }
 
     private void CreateAudioListener()
@@ -168,6 +207,7 @@ public class UIManager
         GameObject gameObject = new GameObject("AudioListener");
         gameObject.AddComponent<AudioListener>();
     }
+
     private void CreateEventSystem()
     {
         GameObject gameObject = new GameObject("EventSystem");

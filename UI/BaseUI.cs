@@ -10,7 +10,7 @@ public class BaseUI : MonoBehaviour
     {
         CanvasGroup = gameObject.AddComponent<CanvasGroup>();
 #if UNITY_EDITOR
-        Log.Info("BaseUI : 加载物体成功 !");
+        Log.Info("BaseUI : 组件添加成功 !");
 #endif
     }
 

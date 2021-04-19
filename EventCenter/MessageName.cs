@@ -13,6 +13,4 @@ public static class MessageName
     public const string OnAutoSaveSoundEffectValue = "OnAutoSaveSoundValue";
     //发送跳转场景事件
     public const string OnToloadScene = "OnToLoadScene";
-    //播放鼠标移入音效
-    public const string OnPlayPointerEnterEffect = "OnPlayPointerEnterEffect";
 }

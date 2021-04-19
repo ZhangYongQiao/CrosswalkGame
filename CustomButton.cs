@@ -16,13 +16,15 @@ public class CustomButton : Button
     public override void OnPointerClick(PointerEventData eventData)
     {
         base.OnPointerClick(eventData);
-        MessageCenter.Instance.Send(MessageName.OnPlaySoundEffect);
+        MessageData data = new MessageData(EffectType.Button);
+        MessageCenter.Instance.Send(MessageName.OnPlaySoundEffect,data);
     }
 
     public override void OnPointerEnter(PointerEventData eventData)
     {
         base.OnPointerEnter(eventData);
-        MessageCenter.Instance.Send(MessageName.OnPlayPointerEnterEffect);
+        MessageData data = new MessageData(EffectType.ButtonEnter);
+        MessageCenter.Instance.Send(MessageName.OnPlaySoundEffect, data);
         DOScale(new Vector3(1.1f, 1.1f, 1f), 0.2f);
     }
 
