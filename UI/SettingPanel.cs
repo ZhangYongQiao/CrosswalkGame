@@ -32,13 +32,13 @@ public class SettingPanel : BaseUI
 
     private void OnChangeMusicValue(float value)
     {
-        DataUtility.SetSoundValue(DataUtility.SoundMusicKey, (int)value);
+        DataUtility.SetSoundValue(DataUtility.SoundMusicKey, value);
         SetVolume(value, Music);
     }
 
     private void OnChangeEffectValue(float value)
     {
-        DataUtility.SetSoundValue(DataUtility.SoundEffectKey, (int)value);
+        DataUtility.SetSoundValue(DataUtility.SoundEffectKey, value);
         SetVolume(value, Effect);
     }
 
@@ -61,9 +61,9 @@ public class SettingPanel : BaseUI
         }
     }
 
-    private void SetSoundValue(int value, Slider slider)
+    private void SetSoundValue(float value, Slider slider)
     {
-        slider.value = value;
+        slider.value = (int)value;
     }
 
     private void OnCloseBtn()

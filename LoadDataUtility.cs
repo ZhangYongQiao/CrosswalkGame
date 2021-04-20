@@ -5,33 +5,55 @@ using Newtonsoft.Json;
 using System.IO;
 using DG.Tweening;
 using System;
+using UnityEngine.SceneManagement;
 
 public class LoadDataUtility : MonoBehaviour
 {
     private void Awake()
     {
         LoadAll();
+        PlayBgmOfActiveScene();
+    }
+
+    private void PlayBgmOfActiveScene()
+    {
+        Scene scene = SceneManager.GetActiveScene();
+        switch (scene.name)
+        {
+            case "1":
+                MessageData data = new MessageData(LevelBgm.one);
+                MessageCenter.Instance.Send(MessageName.OnPlaySoundBgm, data);
+                break;
+            default:
+                break;
+        }
     }
 
     bool isOut = false;
     InGameOrderPanel info = null;
+    bool canClick = true;
+    Coroutine coroutine;
     public void PopInGameOrder()
     {
-        if ((Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1)) && !isOut)
+        if ((Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1)) && !isOut && canClick)
         {
-            info = UIManager.Instance.ShowUI<InGameOrderPanel>(PrefabConst.InGameOrderPanel);
+            canClick = false;
+            if (info == null)
+                info = UIManager.Instance.ShowUI<InGameOrderPanel>(PrefabConst.InGameOrderPanel);
+            else
+                UIManager.Instance.ShowUI(PrefabConst.InGameOrderPanel);
             Vector3 vec = info.transform.position;
             info.transform.DOMove(vec + new Vector3(-420, 0, 0), 0.5f);
             isOut = true;
             MessageData data = new MessageData(EffectType.Pop);
             MessageCenter.Instance.Send(MessageName.OnPlaySoundEffect, data);
         }
-        else if ((Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1)) && isOut)
+        else if ((Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1)) && isOut && !canClick)
         {
             Vector3 vec = info.transform.position;
             info.transform.DOMove(vec + new Vector3(420, 0, 0), 0.5f);
             isOut = false;
-            StartCoroutine(CallBackHide());
+            coroutine = StartCoroutine(CallBackHide());
             MessageData data = new MessageData(EffectType.Pop);
             MessageCenter.Instance.Send(MessageName.OnPlaySoundEffect, data);
         }
@@ -46,6 +68,8 @@ public class LoadDataUtility : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         UIManager.Instance.HideUI(PrefabConst.InGameOrderPanel);
+        canClick = true;
+        StopCoroutine(coroutine);
     }
 
     private void LoadAll()
@@ -58,8 +82,6 @@ public class LoadDataUtility : MonoBehaviour
         InitGem();
     }
 
-    GameObject show;
-    GameObject hide;
     private void InitUI()
     {
         //show = GameObject.FindGameObjectWithTag("ShowCanvas");

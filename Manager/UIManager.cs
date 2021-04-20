@@ -58,8 +58,26 @@ public class UIManager
         GameObject soundMusic = LoadUtility.InstantiateOtherPrefabs(PrefabConst.SoundMusic, LoadUtility.SoundPath,null);
         GameObject.DontDestroyOnLoad(soundEffect);
         GameObject.DontDestroyOnLoad(soundMusic);
+        SetVolume(soundEffect.GetComponent<SoundEffect>(), soundMusic.GetComponent<SoundMusic>());
+        MessageData data = new MessageData(LevelBgm.MainPanel);
+        MessageCenter.Instance.Send(MessageName.OnPlaySoundBgm, data);
     }
 
+    //设置音效音量大小
+    private void SetVolume(SoundEffect effect,SoundMusic music)
+    {
+        if (PlayerPrefs.HasKey(DataUtility.SoundEffectKey))
+        {
+            effect.AudioSource.volume = DataUtility.GetSoundValue(DataUtility.SoundEffectKey)/100;
+        }
+        if (PlayerPrefs.HasKey(DataUtility.SoundMusicKey))
+        {
+            music.AudioSource.volume = DataUtility.GetSoundValue(DataUtility.SoundMusicKey)/100;
+        }
+    }
+
+
+    //隐藏父物体的所有子物体
     public void MoveAllChildToHide(Transform parent)
     {
         for (int i = 0; i < parent.childCount; i++)

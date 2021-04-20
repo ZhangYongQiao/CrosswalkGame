@@ -21,7 +21,6 @@ public class InGameOrderPanel : BaseUI
     private void OnSettingBtn()
     {
         Log.Info("OnSettingBtn");
-
     }
 
     private void OnBackMainBtn()

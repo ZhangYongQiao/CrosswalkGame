@@ -29,14 +29,14 @@ public class DataUtility
 
     #region PlayerPrefs
 
-    public static void SetSoundValue(string key,int value)
+    public static void SetSoundValue(string key,float value)
     {
-        PlayerPrefs.SetInt(key, value);
+        PlayerPrefs.SetFloat(key, value);
     }
 
-    public static int GetSoundValue(string key)
+    public static float GetSoundValue(string key)
     {
-        return PlayerPrefs.GetInt(key);
+        return PlayerPrefs.GetFloat(key);
     }
 
     #endregion
@@ -146,7 +146,7 @@ public class DataUtility
         if(!File.Exists(Path.Combine(EditorSavePath,RolePath)))
         {
             UIManager.Instance.ShowUI(PrefabConst.DataNotExistPanel);
-            Log.Error("读取文件出错");
+            Log.Error("暂无可读取文件");
             return false;
         }
 #else
