@@ -10,6 +10,8 @@ public class SoundEffect : MonoBehaviour
     public AudioClip PopWindowEff;
     public AudioClip RewardEff;
     public AudioClip MonsterDie;
+    public AudioClip Win;
+    public AudioClip Hurt;
 
     public AudioSource AudioSource;
 
@@ -51,9 +53,13 @@ public class SoundEffect : MonoBehaviour
                 AudioSource.clip = RewardEff;
                 break;
             case EffectType.Win:
+                AudioSource.clip = Win;
                 break;
             case EffectType.MonsterDie:
                 AudioSource.clip = MonsterDie;
+                break;
+            case EffectType.Hurt:
+                AudioSource.clip = Hurt;
                 break;
             default:
                 Log.Error("音效消息出错");
@@ -70,5 +76,6 @@ enum EffectType
     ButtonEnter = 4,
     GetReward = 8,
     Win = 16,
-    MonsterDie = 32
+    MonsterDie = 32,
+    Hurt = 64
 }

@@ -14,6 +14,7 @@ public class PrefabConst
     public const string ShowInfoPanel = "ShowInfoPanel";
     public const string Level_one_Desc = "Level_one_Desc";
     public const string FloatTextPrefab = "FloatTextPrefab";
+    public const string WinPanel = "WinPanel";
     #endregion
 
     #region

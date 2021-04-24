@@ -73,8 +73,6 @@ public class PlayerController : MonoBehaviour
         {
             airCanJump = false;
             rigid.velocity = new Vector2(rigid.velocity.x,jumpForce);
-            //Camera camera = GameObject.FindGameObjectWithTag("Camera").GetComponent<Camera>();
-            //UIPlayAnimaUtility.ShakeScreen(camera);
         }
 
         //转向
@@ -107,8 +105,18 @@ public class PlayerController : MonoBehaviour
         else if(collision.CompareTag("Monster"))
         {
             _childAnim.SetBool("Hurt", true);
+            MessageData data = new MessageData(EffectType.Hurt);
+            MessageCenter.Instance.Send(MessageName.OnPlaySoundEffect, data);
             StartCoroutine(BackCommon(_cantMove));
             MessageCenter.Instance.Send(MessageName.OnPlayerHurt);
+        }
+
+        if (collision.CompareTag("Win"))
+        {
+            _canInput = false;
+            MessageData data = new MessageData(EffectType.Win);
+            MessageCenter.Instance.Send(MessageName.OnPlaySoundEffect, data);
+            UIManager.Instance.ShowUI(PrefabConst.WinPanel);
         }
     }
 

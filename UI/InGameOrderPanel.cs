@@ -43,6 +43,7 @@ public class InGameOrderPanel : BaseUI
     {
         MessageCenter.Instance.Send(MessageName.OnGetPlayerPos);
         DataUtility.WriteDataToJson();
+        FloatTextManager.Instance.ShowFT("<color=#00DB00>保存成功</color>");
     }
 
     private void OnDestroy()
