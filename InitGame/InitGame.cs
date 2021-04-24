@@ -6,6 +6,6 @@ public class InitGame : MonoBehaviour
 {
     private void Awake()
     {
-        UIManager.Instance.Init();   
+        UIManager.Instance.Init();
     }
 }

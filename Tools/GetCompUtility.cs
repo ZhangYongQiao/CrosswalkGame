@@ -11,7 +11,7 @@ public class GetCompUtility
     /// <typeparam name="T">特定组件</typeparam>
     /// <param name="parent">指定父物体</param>
     /// <returns>满足条件的Transform集合</returns>
-    public static List<Transform> GetAllSameCompGo<T>(Transform parent = null)
+    public static List<Transform> GetAllSameCompGo<T>(Transform parent = null) where T:Component
     {
         List<Transform> list = new List<Transform>();
 
@@ -32,7 +32,7 @@ public class GetCompUtility
     /// </summary>
     /// <typeparam name="T">指定组件</typeparam>
     /// <returns>满足条件的Transform集合</returns>
-    public static List<Transform> FindCompInAll<T>()
+    public static List<Transform> FindCompInAll<T>() where T : Component
     {
         List<Transform> list = new List<Transform>();
         GameObject[] allGo = GameObject.FindObjectsOfType<GameObject>();
@@ -52,7 +52,7 @@ public class GetCompUtility
     /// <typeparam name="T">指定组件</typeparam>
     /// <param name="parent">指定父物体</param>
     /// <returns>满足条件的Transform集合</returns>
-    public static List<Transform> FindChildCompGo<T>(Transform parent)
+    public static List<Transform> FindChildCompGo<T>(Transform parent) where T:Component
     {
         if (parent == null) 
         {
@@ -120,5 +120,4 @@ public class GetCompUtility
     {
         return name.Remove(name.Length - 7, 7);
     }
-
 }

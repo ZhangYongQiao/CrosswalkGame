@@ -28,6 +28,9 @@ public class PlayerController : MonoBehaviour
 
     private Animator _childAnim;                //子物体Animator组件
 
+    private bool _canInput = true;
+    private float _cantMove = 1f;
+
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
@@ -35,10 +38,24 @@ public class PlayerController : MonoBehaviour
         coll  = GetComponent<Collider2D>();
 
         _childAnim = trans.Find("playerModule").GetComponent<Animator>();
+
+        MessageCenter.Instance.Register(MessageName.OnGetPlayerPos,OnGetPosHandler);
+    }
+
+    private void OnDestroy()
+    {
+        MessageCenter.Instance.Remove(MessageName.OnGetPlayerPos,OnGetPosHandler);
+    }
+
+    private void OnGetPosHandler(MessageData obj)
+    {
+        DataUtility.PlayerPos = trans.position;
     }
 
     private void Update()
     {
+        if (!_canInput) return;
+
         speedY = rigid.velocity.y;
         moveX = Input.GetAxis("Horizontal");
         isGrounded = coll.IsTouchingLayers(ground);                         //是否接地
@@ -89,15 +106,49 @@ public class PlayerController : MonoBehaviour
         }
         else if(collision.CompareTag("Monster"))
         {
-            GetMonsterScore(collision);
+            _childAnim.SetBool("Hurt", true);
+            StartCoroutine(BackCommon(_cantMove));
+            MessageCenter.Instance.Send(MessageName.OnPlayerHurt);
         }
     }
 
-    Animator anim;                                          //共用动画状态机
-    private void GetMonsterScore(Collider2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        CommonFuncToGetScore(EffectType.GetReward, ScoreType.DieMonster);
-        //DelayDesGo(collision, 0.3f);
+        if (collision.transform.name == "DieCollider")
+        {
+            GetMonsterScore(collision);
+            SetSpeedY();
+            MessageData data = new MessageData(EffectType.MonsterDie);
+            MessageCenter.Instance.Send(MessageName.OnPlaySoundEffect, data);
+        }
+    }
+
+    IEnumerator BackCommon(float stamp)
+    {
+        _canInput = false;
+        yield return new WaitForSeconds(stamp);
+        _canInput = true;
+        _childAnim.SetBool("Hurt", false);
+
+    }
+
+    private float _speedY = 20;
+    //踩死怪物弹跳
+    public void SetSpeedY()
+    {
+        rigid.velocity = new Vector2(rigid.velocity.x, _speedY);
+    }
+
+    Animator anim;                                          //共用动画状态机
+    private void GetMonsterScore(Collision2D collision)
+    {
+        collision.transform.parent.GetComponent<Collider2D>().enabled = false;  
+        anim = collision.transform.parent.GetComponent<Animator>();
+        if (anim)
+            anim.SetTrigger("Die");
+        CommonFuncToGetScore(EffectType.MonsterDie, ScoreType.DieMonster);
+        DelayDesGo(collision.transform.parent.GetComponent<Collider2D>(), 0.5f);
+
     }
 
     private void GetGem(Collider2D collision)
@@ -114,7 +165,7 @@ public class PlayerController : MonoBehaviour
         DelayDesGo(collision, 0.3f);
     }
 
-#region 提取相同部分
+    #region 提取相同部分
 
     private void SetAnimatorState(Collider2D collision,string triggerName)
     {

@@ -8,7 +8,7 @@ public static class TransformExtension
     /// </summary>
     /// <param name="trans">父对象Transform</param>
     /// <returns>返回Transform集合</returns>
-    public static List<Transform> GetChildContainComp<T>(this Transform trans)
+    public static List<Transform> GetChildContainComp<T>(this Transform trans) where T:Component
     {
         List<Transform> childs = new List<Transform>();
         for (int i = 0; i < trans.childCount; i++)

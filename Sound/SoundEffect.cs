@@ -9,6 +9,7 @@ public class SoundEffect : MonoBehaviour
     public AudioClip EnterPointerEff;
     public AudioClip PopWindowEff;
     public AudioClip RewardEff;
+    public AudioClip MonsterDie;
 
     public AudioSource AudioSource;
 
@@ -16,6 +17,12 @@ public class SoundEffect : MonoBehaviour
     {
         MessageCenter.Instance.Register(MessageName.OnPlaySoundEffect, PlaySoundEffectHandler);
         MessageCenter.Instance.Register(MessageName.OnAutoSaveSoundEffectValue, SaveSoundEffectValueHandler);
+    }
+
+    private void OnDestroy()
+    {
+        MessageCenter.Instance.Remove(MessageName.OnPlaySoundEffect, PlaySoundEffectHandler);
+        MessageCenter.Instance.Remove(MessageName.OnAutoSaveSoundEffectValue, SaveSoundEffectValueHandler);
     }
 
     private void SaveSoundEffectValueHandler(MessageData obj)
@@ -45,18 +52,14 @@ public class SoundEffect : MonoBehaviour
                 break;
             case EffectType.Win:
                 break;
+            case EffectType.MonsterDie:
+                AudioSource.clip = MonsterDie;
+                break;
             default:
                 Log.Error("音效消息出错");
                 break;
         }
         AudioSource.Play();
-
-    }
-
-    private void OnDestroy()
-    {
-        MessageCenter.Instance.Remove(MessageName.OnPlaySoundEffect, PlaySoundEffectHandler);
-        MessageCenter.Instance.Remove(MessageName.OnAutoSaveSoundEffectValue, SaveSoundEffectValueHandler);
     }
 }
 
@@ -66,5 +69,6 @@ enum EffectType
     Button = 2,
     ButtonEnter = 4,
     GetReward = 8,
-    Win = 16
+    Win = 16,
+    MonsterDie = 32
 }

@@ -12,6 +12,8 @@ public class PrefabConst
     public const string InGameOrderPanel = "InGameOrderPanel";
     public const string DataNotExistPanel = "DataNotExistPanel";
     public const string ShowInfoPanel = "ShowInfoPanel";
+    public const string Level_one_Desc = "Level_one_Desc";
+    public const string FloatTextPrefab = "FloatTextPrefab";
     #endregion
 
     #region

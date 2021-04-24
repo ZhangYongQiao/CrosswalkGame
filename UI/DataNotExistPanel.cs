@@ -16,6 +16,6 @@ public class DataNotExistPanel : BaseUI
 
     private void OnClickPanel()
     {
-        UIManager.Instance.HideUI(PrefabConst.DataNotExistPanel);
+        UIManager.Instance.HideUI(PrefabConst.DataNotExistPanel,false);
     }
 }

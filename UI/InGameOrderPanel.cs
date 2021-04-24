@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using System;
+using UnityEngine.SceneManagement;
 
 public class InGameOrderPanel : BaseUI
 {
@@ -20,17 +21,28 @@ public class InGameOrderPanel : BaseUI
 
     private void OnSettingBtn()
     {
-        Log.Info("OnSettingBtn");
+        UIManager.Instance.ShowUI(PrefabConst.SettingPanel);
     }
 
     private void OnBackMainBtn()
     {
+        FloatTextManager.Instance._queue.Clear();
+        FloatTextManager.Instance._cacheQueue.Clear();
+
+        Destroy(GameObject.Find("SoundEffect(Clone)"));
+        Destroy(GameObject.Find("SoundMusic(Clone)"));
+        Destroy(GameObject.Find("UICanvas(Clone)"));
+        UIManager.Instance.Clear();
+        SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene());
+        DataUtility.SceneName = "MainPanel";
+        SceneManager.LoadScene("Loading");
         Log.Info("OnBackMainBtn");
     }
 
     private void OnSaveBtn()
     {
-        Log.Info("OnSaveBtn");
+        MessageCenter.Instance.Send(MessageName.OnGetPlayerPos);
+        DataUtility.WriteDataToJson();
     }
 
     private void OnDestroy()

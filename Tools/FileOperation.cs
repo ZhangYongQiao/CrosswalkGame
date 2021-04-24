@@ -18,7 +18,9 @@ public class FileOperation
         if (File.Exists(path))
         {
             using(StreamWriter sw = new StreamWriter(path, isAppend, Encoding.UTF8))
+            {
                 sw.Write(txt);
+            }
         }
         else
         {

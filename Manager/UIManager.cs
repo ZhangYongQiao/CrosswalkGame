@@ -43,6 +43,17 @@ public class UIManager
 
     private Stack<GameObject> _popUI;
 
+    public void Clear()
+    {
+        if (_instantiatedDic != null)
+            _instantiatedDic.Clear();
+        if (_hideUIDic != null)
+            _hideUIDic.Clear();
+        if (_popUI != null)
+            _popUI.Clear();
+    }
+
+
     public void Init()
     {
         GameObject go = LoadUICanvas();
@@ -50,8 +61,6 @@ public class UIManager
         ShowUI(PrefabConst.MainPanel);
         CreateAudioListener();
         CreateEventSystem();
-
-        //ShowUI(PrefabConst.InGameOrderPanel);
 
         //实例化音源
         GameObject soundEffect = LoadUtility.InstantiateOtherPrefabs(PrefabConst.SoundEffects, LoadUtility.SoundPath,null);
@@ -83,7 +92,7 @@ public class UIManager
         for (int i = 0; i < parent.childCount; i++)
         {
             Transform trans = parent.GetChild(i);
-            HideUI(GetCompUtility.SubClone(trans.name));
+            HideUI(GetCompUtility.SubClone(trans.name),false);
         }
     }
 
@@ -132,12 +141,12 @@ public class UIManager
     /// 关闭UI
     /// </summary>
     /// <param name="name">UI名称</param>
-    public void HideUI(string name)
-    {
+    public void HideUI(string name,bool isDestroy)
+    {   
         if (_hideUIDic == null) _hideUIDic = new Dictionary<string, GameObject>();
         if (_instantiatedDic.ContainsKey(name))
-        {
-            MoveToHide(name);
+        {   
+            MoveToHide(name,isDestroy);
         }
         else
         {
@@ -150,19 +159,25 @@ public class UIManager
     /// 关闭窗口时，将其移动至HideCanvas下
     /// </summary>
     /// <param name="name">UI名称</param>
-    private void MoveToHide(string name)
-    {
+    private void MoveToHide(string name,bool isDestroy)
+    {   
+        if(isDestroy)
+        {
+            PopUI();
+            GameObject.Destroy(_instantiatedDic[name]);
+            return;
+        }
         _instantiatedDic[name].transform.SetParent(HideCanvasGo.transform);
         _hideUIDic.Add(name, _instantiatedDic[name]);
         _hideUIDic[name].SetActive(false);
-        PopUI(_hideUIDic[name]);
+        PopUI();
     }
 
     /// <summary>
     /// 显示窗口时，将其移动至ShowCanvas下
     /// </summary>
     /// <param name="name">UI名称</param>
-    private void MoveToShow<T>(string name,out T comp)
+    private void MoveToShow<T>(string name,out T comp) where T : Component
     {
         _hideUIDic[name].transform.SetParent(ShowCanvasGo.transform);
         _hideUIDic[name].SetActive(true);
@@ -199,7 +214,7 @@ public class UIManager
     /// 关闭窗口时，出栈
     /// </summary>
     /// <param name="go"></param>
-    private void PopUI(GameObject go)
+    private void PopUI()
     {
         if (_popUI.Count > 1)
         {
@@ -213,20 +228,20 @@ public class UIManager
     }
 
     #region 创建基本组件
-    private GameObject LoadUICanvas()
+    public GameObject LoadUICanvas()
     {
         GameObject canvas = Resources.Load<GameObject>("Prefabs/UIPrefabs/UICanvas");
         GameObject go = GameObject.Instantiate<GameObject>(canvas);
         return go;
     }
 
-    private void CreateAudioListener()
+    public void CreateAudioListener()
     {
         GameObject gameObject = new GameObject("AudioListener");
         gameObject.AddComponent<AudioListener>();
     }
 
-    private void CreateEventSystem()
+    public void CreateEventSystem()
     {
         GameObject gameObject = new GameObject("EventSystem");
         gameObject.AddComponent<EventSystem>();

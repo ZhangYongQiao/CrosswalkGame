@@ -43,7 +43,7 @@ public static class Log
         }
         if (!File.Exists(Path.Combine(FilePath, WriteToThisFile)))
         {
-            File.Create(Path.Combine(FilePath, WriteToThisFile));
+            File.Create(Path.Combine(FilePath, WriteToThisFile)).Dispose();
         }
     }
 

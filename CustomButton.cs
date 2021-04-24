@@ -8,11 +8,6 @@ using DG.Tweening;
 [AddComponentMenu("UI/CustomButton",200)]
 public class CustomButton : Button
 {
-    protected override void Awake()
-    {
-        base.Awake();
-    }
-
     public override void OnPointerClick(PointerEventData eventData)
     {
         base.OnPointerClick(eventData);
@@ -36,7 +31,7 @@ public class CustomButton : Button
 
     private void DOScale(Vector3 vec,float t)
     {
-        this.transform.DOScale(vec, t);
+        transform.DOScale(vec, t);
     }
 
 }

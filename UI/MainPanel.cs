@@ -39,18 +39,19 @@ public class MainPanel : BaseUI
 
     private void OnResumeBtn()
     {
-        bool isExist = DataUtility.ReadJsonToData();
+        bool isExist = DataUtility.FileIsExist(true);
 
         if (isExist)
         {
-            string resumeScene = CurPlayer.Instance.Scene;
-            DataUtility.SceneName = resumeScene;
+            UIManager.Instance.MoveAllChildToHide(UIManager.Instance.ShowCanvasGo.transform);
+            DataUtility.isContinue = true;
+            DataUtility.SceneName = DataUtility.ReadSaveScene();
             SceneManager.LoadScene(LoadUtility.LoadingScene);
         }
     }
 
     private void OnBeginBtn()
-    {   
+    {
         UIManager.Instance.MoveAllChildToHide(UIManager.Instance.ShowCanvasGo.transform);
         string name = LoadUtility.FirstScene;
         DataUtility.SceneName = name;

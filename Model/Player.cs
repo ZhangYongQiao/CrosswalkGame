@@ -23,7 +23,7 @@ public class CurPlayer
     private CurPlayer() { }
 
     public Vector3 Pos;
-    public byte Blood;
+    public int Blood;
     public int Score;
     public string Scene;
 }
@@ -32,7 +32,7 @@ public class CurPlayer
 public class Player
 {
     public Vector3 Pos;
-    public byte Blood;
+    public int Blood;
     public int Score;
     public string Scene;
 }

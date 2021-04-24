@@ -9,6 +9,7 @@ public class SettingPanel : BaseUI
     public Slider EffectSlider;
     public Slider MusicSlider;
     public CustomButton ExitBtn;
+    public CustomButton DeleteFileBtn;
 
     private AudioSource Effect;
     private AudioSource Music;
@@ -17,6 +18,7 @@ public class SettingPanel : BaseUI
     {
         base.Awake();
         ExitBtn.onClick.AddListener(OnCloseBtn);
+        DeleteFileBtn.onClick.AddListener(OnDleteFileBtn);
         EffectSlider.onValueChanged.AddListener(OnChangeEffectValue);
         MusicSlider.onValueChanged.AddListener(OnChangeMusicValue);
 
@@ -27,6 +29,21 @@ public class SettingPanel : BaseUI
         {
             Effect = effect.GetComponent<AudioSource>();
             Music = music.GetComponent<AudioSource>();
+        }
+    }
+
+    public static bool canClick = true;
+    private void OnDleteFileBtn()
+    {
+        if (!DataUtility.FileIsExist(false) && canClick)
+        {
+            canClick = false;
+            FloatTextManager.Instance.ShowFT("存档已删除");
+            return;
+        }
+        else
+        {
+            DataUtility.DeleteAllData();
         }
     }
 
@@ -68,7 +85,7 @@ public class SettingPanel : BaseUI
 
     private void OnCloseBtn()
     {
-        UIManager.Instance.HideUI(PrefabConst.SettingPanel);
+        UIManager.Instance.HideUI(PrefabConst.SettingPanel,false);
     }
 
 }

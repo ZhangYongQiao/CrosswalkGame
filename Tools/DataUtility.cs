@@ -26,6 +26,8 @@ public class DataUtility
     public const string InitPath = "InitDataFolder";
 
     public static string SceneName = null;
+    public static bool isContinue = false;
+    public static Vector3 PlayerPos;
 
     #region PlayerPrefs
 
@@ -48,6 +50,7 @@ public class DataUtility
     /// </summary>
     public static void WriteDataToJson()
     {
+        CurPlayer.Instance.Pos = PlayerPos;
         Player player = new Player
         {
             Pos = CurPlayer.Instance.Pos,
@@ -64,14 +67,19 @@ public class DataUtility
         JsonToWrite<List<Monster>>(monsterList, MonsterPath);
         JsonToWrite<List<Vector3>>(gemPosList, GemPath);
         JsonToWrite<List<Vector3>>(cherryPosList, CherryPath);
+        Log.Error("保存数据成功");
     }
 
     private static List<Monster> GetMonsterList()
     {
         List<Monster> monsterList = new List<Monster>();
-        GameObject box = GameObject.Find("MonsterBox(Clone)");
-        if (box)
+        GameObject box = GameObject.Find("MonsterBox");
+        if (box.transform.childCount == 0)
         {
+            return monsterList;
+        }
+        if (box)
+        {   
             for (int i = 0; i < box.transform.childCount; i++)
             {
                 Transform trans = box.transform.GetChild(i);
@@ -84,13 +92,13 @@ public class DataUtility
                 }
                 else if (trans.name.Remove(trans.name.Length - 7, 7) == "Opossum")
                 {
-                    monster.monsterType = MonsterType.Frog;
+                    monster.monsterType = MonsterType.Opossum;
                     monster.Pos = trans.position;
                     monsterList.Add(monster);
                 }
                 else
                 {
-                    monster.monsterType = MonsterType.Opossum;
+                    monster.monsterType = MonsterType.Frog;
                     monster.Pos = trans.position;
                     monsterList.Add(monster);
                 }
@@ -106,7 +114,7 @@ public class DataUtility
 
 #endregion
 
-    #region 读取数据
+#region 读取数据
 
     public static List<Vector3> ReadInitGemData(string level)
     {
@@ -136,51 +144,143 @@ public class DataUtility
     {
         string newStr = string.Format("Level_{0}_Player.json", level);
         TextAsset initData = Resources.Load<TextAsset>(Path.Combine(InitPath, newStr));
-        Player player = JsonConvert.DeserializeObject<Player>(initData.name) as Player;
+        Player player = JsonConvert.DeserializeObject<Player>(initData.text) as Player;
         return player;
     }
 
-    public static bool ReadJsonToData()
+    public static bool FileIsExist(bool isShow = true)
     {
 #if UNITY_EDITOR
-        if(!File.Exists(Path.Combine(EditorSavePath,RolePath)))
-        {
-            UIManager.Instance.ShowUI(PrefabConst.DataNotExistPanel);
+        if(!File.Exists(Path.Combine(EditorSavePath,RolePath)) && !File.Exists(Path.Combine(EditorSavePath, MonsterPath))&&
+            !File.Exists(Path.Combine(EditorSavePath, CherryPath)) && !File.Exists(Path.Combine(EditorSavePath, GemPath)))
+        {   
+            if(isShow)
+                UIManager.Instance.ShowUI(PrefabConst.DataNotExistPanel);
             Log.Error("暂无可读取文件");
             return false;
         }
 #else
-        if(!File.Exists(Path.Combine(StandardAloneSavePath,RolePath)))
+        if(!File.Exists(Path.Combine(StandardAloneSavePath,RolePath))&& !File.Exists(Path.Combine(StandardAloneSavePath, MonsterPath))&&!File.Exists(Path.Combine(StandardAloneSavePath, CherryPath)) && !File.Exists(Path.Combine(StandardAloneSavePath, GemPath)))
         {
-            UIManager.Instance.ShowUI(PrefabConst.DataNotExistPanel);
+        if(isShow)
+                UIManager.Instance.ShowUI(PrefabConst.DataNotExistPanel);
             return false;
         }
 #endif
+        return true;
+    }
+
+    public static void ReadData()
+    {   
+        if(!FileIsExist(true))
+        {
+            Log.Error("文件不存在");
+            return;
+        }
         Player player = ReadToData<Player>(RolePath);
         List<Monster> monsterList = ReadToData<List<Monster>>(MonsterPath);
         List<Vector3> gemListPos = ReadToData<List<Vector3>>(GemPath);
         List<Vector3> cherryListPos = ReadToData<List<Vector3>>(CherryPath);
 
-        if(player == null || monsterList == null || monsterList.Count == 0 || gemListPos == null 
-            || gemListPos.Count ==0 || cherryListPos == null || cherryListPos.Count == 0)
+        if (player == null || monsterList == null || gemListPos == null || cherryListPos == null)
         {
             Log.Error("数据加载出错");
+            return;
         }
 
         CurPlayer.Instance.Pos = player.Pos;
         CurPlayer.Instance.Blood = player.Blood;
         CurPlayer.Instance.Scene = player.Scene;
         CurPlayer.Instance.Score = player.Score;
-
-        CurMonster.Instance.MonsterList = monsterList; 
-
+        CurMonster.Instance.MonsterList = monsterList;
         CurGem.Instance.PosList = gemListPos;
         CurCherry.Instance.PosList = cherryListPos;
 
-        return true;
+        InstantiateData(player, monsterList, gemListPos, cherryListPos);
     }
 
-#endregion
+    private static void InstantiateData(Player player, List<Monster> monsterList, List<Vector3> gemListPos, List<Vector3> cherryListPos)
+    {
+        GameObject role = LoadUtility.InstantiateOtherPrefabs(PrefabConst.Player, LoadUtility.OtherPath);
+        role.transform.position = player.Pos;
+
+        GameObject monster = null;
+        if (GameObject.Find("MonsterBox") == null)
+            monster = new GameObject("MonsterBox");
+        foreach (var item in monsterList)
+        {
+            if (item.monsterType == MonsterType.Eagle)
+            {
+                GameObject go = LoadUtility.InstantiateMonsterPrefabs(PrefabConst.EaglePrefab, monster.transform, false);
+                go.transform.position = item.Pos;
+            }
+            else if (item.monsterType == MonsterType.Opossum)
+            {
+                GameObject go = LoadUtility.InstantiateMonsterPrefabs(PrefabConst.OpossumPrefab, monster.transform, false);
+                go.transform.position = item.Pos;
+            }
+            else
+            {
+                GameObject go = LoadUtility.InstantiateMonsterPrefabs(PrefabConst.FrogPrefab, monster.transform, false);
+                go.transform.position = item.Pos;
+            }
+        }
+
+        GameObject gems = null;
+        if (GameObject.Find("GemBox") == null)
+            gems = new GameObject("GemBox");
+        foreach (var item in gemListPos)
+        {
+            
+                GameObject go = LoadUtility.InstantiateOtherPrefabs(PrefabConst.GemPrefab, LoadUtility.GemPath, gems.transform);
+                go.transform.position = item;
+        }
+
+        GameObject cherrys = null;
+        if (GameObject.Find("CherryBox") == null)
+            cherrys = new GameObject("CherryBox");
+        foreach (var item in cherryListPos)
+        {
+            GameObject go = LoadUtility.InstantiateOtherPrefabs(PrefabConst.CherryPrefab, LoadUtility.CherryPath, cherrys.transform);
+            go.transform.position = item;
+        }
+
+        Log.Info("初始化成功");
+    }
+
+    public static string ReadSaveScene()
+    {
+        if (!FileIsExist(false))
+        {
+            Log.Error("文件不存在");
+            return null;
+        }
+        Player player = ReadToData<Player>(RolePath);
+        return player.Scene;
+    }
+
+    #endregion
+
+    public static void DeleteAllData(bool isDelete = true)
+    {
+        if (FileIsExist(false))
+        {
+#if UNITY_EDITOR
+            File.Delete(Path.Combine(EditorSavePath, RolePath));
+            File.Delete(Path.Combine(EditorSavePath, MonsterPath));
+            File.Delete(Path.Combine(EditorSavePath, GemPath));
+            File.Delete(Path.Combine(EditorSavePath, CherryPath));
+            FloatTextManager.Instance.ShowFT("删除存档成功");
+            Log.Info("删档成功");
+#else
+            File.Delete(Path.Combine(StandardAloneSavePath, RolePath));    
+            File.Delete(Path.Combine(StandardAloneSavePath, MonsterPath));    
+            File.Delete(Path.Combine(StandardAloneSavePath, GemPath));    
+            File.Delete(Path.Combine(StandardAloneSavePath, CherryPath)); 
+            FloatTextManager.Instance.ShowFT("删除存档成功");
+#endif
+        }
+    }
 
     /// <summary>
     /// 序列化，写入文件
@@ -196,7 +296,7 @@ public class DataUtility
 #if UNITY_EDITOR
             FileOperation.WriteFile(Path.Combine(EditorSavePath, fileName),jsonTxt,false);
 #else
-            FileOperation.WriteFile(Path.Combine(StandardAloneSavePath, fileName),jsonTxt);
+            FileOperation.WriteFile(Path.Combine(StandardAloneSavePath, fileName),jsonTxt,false);
 #endif
         }
         else
